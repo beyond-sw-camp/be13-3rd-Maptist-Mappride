@@ -81,8 +81,6 @@
   const address = reactive({ addressValue: ''});
   const categories = reactive({ categoriesValue: ''});
 
-  const member = ref({});
-
   const logout = () => {
    const isConfirmed = window.confirm("로그아웃 하시겠습니까?");
    if (!isConfirmed) return; // 취소 시 아무 동작 안 함
@@ -93,10 +91,7 @@
 
   const txtChanging = async (event) => {
     try {
-      if (selectedOption.value === 'address') {
-        // address.addressValue = txtSearchModel.value;
-      } else if (selectedOption.value === 'user') {
-
+      if (selectedOption.value === 'user') {
         txtSearchModel.value = event.target.value;
 
         const response = await apiClient.get(`/members/name?name=${txtSearchModel.value}`);
@@ -119,18 +114,21 @@
     filteredData.value = [];
   };
 
-  const btnSearchClick = async () => {
-    if(!txtButtonModel.value) return;
+  const btnSearchClick = async () => {    
+    try{
+      if (selectedOption.value === 'address') {
+        address.addressValue = txtSearchModel.value;
+      } else if (selectedOption.value === 'user') {
+        if(!txtButtonModel.value) return;
+        
+        const response = await apiClient.get(`/categories/${txtButtonModel.value}`);
 
-    try {
-      const response = await apiClient.get(`/categories/${txtButtonModel.value}`);
-
-      if (response.status === 200) {
-        categories.categoriesValue = response.data;
-      } else {
-        console.error('API 요청 실패:', response.status);
+        if (response.status === 200) {
+          categories.categoriesValue = response.data;
+        } else {
+          console.error('API 요청 실패:', response.status);
+        }
       }
-      
     } catch (error) {
       console.error('API 요청 실패:', error);
       alert('검색 실패. 다시 시도해주세요.');
