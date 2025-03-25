@@ -41,9 +41,13 @@
       <button class="btnSearch">search</button>
     </div>
 
-    <div v-if="route.name !== 'Login'">
+    <!-- <div v-if="route.name !== 'Login'">
       <button class="btnLogout">logout</button>
-    </div>
+    </div> -->
+
+    <button class="logout" v-if="route.path !== '/api/v1'" @click="logout">
+    logout
+  </button>
     
     <div v-if="route.name === 'Login'">
       <input class="txtSearch" type="text" placeholder="Search..." />
@@ -59,11 +63,11 @@
     
 <script setup>
   import { ref, reactive, onMounted } from 'vue';
-  import { useRoute } from 'vue-router';
+  import { useRoute, useRouter  } from 'vue-router';
   import apiClient from '@/api/axios.js';
 
   import MainComponent from '../MainComponent.vue';
-
+  const router = useRouter();
   const route = useRoute();
   const selectedOption = ref('address');
   const txtSearchModel = ref('');
@@ -72,6 +76,14 @@
   });
 
   const member = ref({});
+
+  const logout = () => {
+  const isConfirmed = window.confirm("로그아웃 하시겠습니까?");
+  if (!isConfirmed) return; // 취소 시 아무 동작 안 함
+
+  localStorage.removeItem('accessToken'); // 토큰 삭제
+  router.push({ name: 'Login' }); // 로그인 페이지로 이동
+};
 
   const searchClick = async () => {
     if (txtSearchModel.value.trim() === '') {
@@ -131,7 +143,7 @@
     height: 1080px;
     position: absolute;
   }
-  .map, .my-page, .my-categories {
+  .map, .my-page, .my-categories{
     color: #000000;
     text-align: center;
     font-family: "Stylish-Regular", sans-serif;
@@ -169,6 +181,28 @@
   .my-categories:hover {
     background-color: #f0f0f0;
   }
+  .logout {
+    color: #000000;
+    text-align: center;
+    font-family: "Stylish-Regular", sans-serif;
+    font-size: 20px;
+    font-weight: 400;
+    position: absolute;
+    width: 80px;
+    height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+    left: 1404px;
+    top: 30px;
+  }
+  .logout:hover {
+    background-color: #f0f0f0;
+  }
+
   button:hover {
     background-color: #f0f0f0;
   }
