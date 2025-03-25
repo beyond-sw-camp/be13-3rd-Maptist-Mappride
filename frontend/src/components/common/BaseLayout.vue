@@ -39,7 +39,7 @@
       </ul>
       <button class="btnSearch" @click="btnSearchClick">search</button>
 
-      <MainComponent :address="address.addressValue" :categories="categories.categoriesValue"/>
+      <!-- <MainComponent :address="address.addressValue" :categories="categories.categoriesValue"/> -->
 
     </div>
 
@@ -90,13 +90,6 @@
    localStorage.removeItem('accessToken'); // 토큰 삭제
    router.push({ name: 'Login' }); // 로그인 페이지로 이동
  };
-
-  const searchClick = async () => {
-    if (txtSearchModel.value.trim() === '') {
-      alert('검색어를 입력해주세요.');
-      return;
-    }
-  };
 
   const txtChanging = async (event) => {
     try {
