@@ -2,7 +2,6 @@
   <div class="full">
 
 
-    <div class="comment">Comment</div>
     <div class="rectangle-50"></div>
 
     <!-- 오른쪽 대표사진 버튼 -->
@@ -24,7 +23,10 @@
     <img class="image-35" src="/src/assets/images/placeDetailComponent/image-350.png" />
     <img class="line-13" src="/src/assets/images/public/line-60.png" />
     <img class="line-14" src="/src/assets/images/public/line-60.png" />
-    <div class="div3">분좋카</div>
+
+    <!-- myplace name -->
+    <!-- <div class="div3">분좋카</div> -->
+    <div class="div3">{{ placeName }}</div>
     <div class="line-16"></div>
 
     <!-- 카테고리 드롭 다운 -->
@@ -91,9 +93,10 @@
     <div class="rectangle-51">
     <ul style="list-style-type: none;">
       <li v-for="(comment, index) in comments" :key="index" class="comment-item">
-        <div class="comment-id">{{ comment.memberId }}</div>
-        <div class="comment-content">{{ comment.content }}</div>
-        <div class="comment-date">{{ comment.date }}</div>
+        <div class="comment-memberId">{{ comment.memberId }}</div>
+        <div class="comment-content">{{ comment.comment }}</div>
+        <!-- 벡엔드에서 추가 필요?
+        <div class="comment-date">{{ comment.date }}</div> -->
 
         <!-- 댓글 버튼 -->
         <!-- 로그인된 사용자와 댓글 작성자가 같을 때만 버튼 표시 -->
@@ -189,44 +192,89 @@
 
 // 디스코드 연결 코드 수정본 + perp
 import apiClient from '@/api/axios.js';
-  import { ref, onMounted } from 'vue';
+import { ref, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 
+
+const route = useRoute();
   const comments = ref([]);
   const member = ref([]);
+  const placeId = ref(''); // placeId를 저장할 변수
   const commentMemberId = ref('');
   
-  onMounted(() => {
-    apiClient.get('/api/v1/comment/${place-id}').then(response => {
-      comments.value = response.data;
-    }).catch(error => {
-      console.error("에러 발생:", error);
-    });
+  onMounted(async() => {
+    
+      placeId.value = String(route.params.placeId);
+      console.log(String(route.params.placeId));
+      
+      console.log(placeId.value);
+
+      apiClient.get(`/comments/${placeId.value}`).then(response => {
+        comments.value = response.data;
+      }).catch(error => {
+        console.error("댓글 데이터 로딩 중 오류 발생", error);
+      });
+        
   });
 
   onMounted(() => {
-  apiClient.get('/api/v1/members')
-    .then(response => {
-      member.value = response.data;
-    })
-    .catch(error => {
-      console.error("데이터 로딩 중 오류 발생:", error);
-    });
-});
+    apiClient.get('/members')
+      .then(response => {
+        member.value = response.data;
+      })
+      .catch(error => {
+        console.error("멤버 데이터 로딩 중 오류 발생:", error);
+      });
+  });
   
+  
+  // 보류
+  // perp fetchmember 버전 수정
+//   const fetchCommmetsData = async () => {
+//   try {
+//     const response = 
+//     await apiClient.get(`/comments/${place-id}`).then((response) => {
+//           console.log(response);
+//       })
+//       // 비동기 통신이 실패했을 때 호출되는 함수를 지정한다.
+//       .catch((error) => {
+//           console.log(error);
+//       });;
+//     comments.value = response.data; // API 응답 데이터를 저장
+//   } catch (error) {
+//     console.error('댓글 데이터를 가져오는 중 오류 발생:', error);
+//   }
+// };
+
+// onMounted(() => {
+//   fetchCommmetsData(comments.value);
+  
+// });
+
+// 삭제 예정
+// // 뉴 댓글 데이터 가져오기
+// const fetchComments = async () => {
+//   try {
+//     // const response = await apiClient.get(`/api/v1/comment/${placeId}`);
+//     const response = await apiClient.get(`/api/v1/comment/{place-id}`);
+//     comments.value = response.data.items; // API에서 받은 댓글 데이터
+//   } catch (error) {
+//     console.error('댓글 데이터를 가져오는 중 오류 발생:', error);
+//   }
+// };
+
+// 기본 comment onmounted
+// onMounted(() => {
+//     apiClient.get(`/comments/${place-id}`).then(response => {
+//       comments.value = response.data;
+//     }).catch(error => {
+//       console.error("댓글 데이터 로딩 중 오류 발생", error);
+//     });
+//   });
 
 
-const placeId = '신대방삼거리역점'; // 현재 장소 ID (예시)
 
-// 뉴 댓글 데이터 가져오기
-const fetchComments = async () => {
-  try {
-    // const response = await apiClient.get(`/api/v1/comment/${placeId}`);
-    const response = await apiClient.get(`/api/v1/comment/{place-id}`);
-    comments.value = response.data.items; // API에서 받은 댓글 데이터
-  } catch (error) {
-    console.error('댓글 데이터를 가져오는 중 오류 발생:', error);
-  }
-};
+
 
 // 뉴 댓글 수정
 const editComment = (index) => {
@@ -245,47 +293,6 @@ const deleteComment = (index) => {
     // 서버에 삭제 요청 추가 가능
   }
 };
-/* import apiClient from '@/api';
-    import { onBeforeRouteUpdate, useRoute, useRouter } from 'vue-router';
-
-    const comments = ref([]);
-    const currentRoute = useRoute();
-    const router = useRouter();
-    // const pageInfo = reactive({
-    //     // 값을 정수로 변환하고 실패하면 1을 기본값으로 사용
-    //     currentPage: parseInt(currentRoute.query.page) || 1,
-    //     totalCount: 0, // 전체 데이터 수
-    //     pageLimit: 5, // 페이지네이션에 보이는 페이지의 수
-    //     listLimit: 0 // 한 페이지에 표시될 리스트의 수
-    const pageInfo = reactive({
-        // 값을 정수로 변환하고 실패하면 1을 기본값으로 사용
-        currentPage: parseInt(currentRoute.query.page) || 1,
-        totalCount: 0, // 전체 데이터 수
-        pageLimit: 5, // 페이지네이션에 보이는 페이지의 수
-        listLimit: 0 // 한 페이지에 표시될 리스트의 수
-    });
-
-    // const fetchDepartments = async (page) => {
-    const fetchComments = async (page) => {
-        try {
-            // const response = await apiClient.get(`/api/v1/university-service/departments?page=${page}&numOfRows=10`);
-            const response = await apiClient.get(`/api/v1/comment/${place-id}`);
-
-            // departments.value = response.data.items;
-            comments.value = response.data.items;
-
-            pageInfo.totalCount = response.data.totalCount;
-            
-        } catch (error) {
-            if (error.response.data.code === 404) {
-                alert(error.response.data.message);
-
-                router.push({name: 'departments'});
-            } else {
-                alert('에러가 발생했습니다.');
-            }
-        }
-    } */
 
 
 const selectedColor = ref("red");
@@ -296,37 +303,6 @@ const showImage45 = ref(false);
 const showImage46 = ref(true);
 const showImage47 = ref(false);
 
-  
-// const itemClick = (no) => {
-//         console.log(no);
-//         router.push({name: 'departments/no', params: {no}});
-//     };
-
-//     // const deleteDepartment = async (no) => {
-//     const deleteDepartment = async (no) => {
-//         try {
-//             const response = await apiClient.delete(
-//                 `/api/v1/university-service/departments/${no}`
-//             );
-
-//             if (response.data.code === 200){
-//                 alert('정상적으로 삭제되었습니다.')
-
-//                 // 페이지 다시 그리기
-//                 fetchDepartments(pageInfo.currentPage);
-//             }
-//         } catch (error) {
-//             if (error.response.data.code === 403) {
-//                 alert('권한이 없는 사용자입니다');
-//             } else if (error.response.data.code === 404){
-//                 alert(error.response.data.message);
-//                 router.push({name: 'departments'});
-//             }
-//             else {
-//                 alert('에러가 발생했습니다.');
-//             }
-//         }
-//     };
 
   
   
@@ -532,56 +508,6 @@ const showImage47 = ref(false);
   left: 20.14px;
 }
 
-
-/* 
-.my-categories {
-  color: #000000;
-  text-align: center;
-  font-family: "Stylish-Regular", sans-serif;
-  font-size: 25px;
-  font-weight: 400;
-  position: absolute;
-  left: 46.6px;
-  top: 494.65px;
-  width: 291.6px;
-  height: 104.41px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  -webkit-text-stroke: 1px #ffffff;
-}
-.my-page {
-  color: #000000;
-  text-align: center;
-  font-family: "Stylish-Regular", sans-serif;
-  font-size: 25px;
-  font-weight: 400;
-  position: absolute;
-  left: 19.97px;
-  top: 419.77px;
-  width: 315.56px;
-  height: 104.41px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  -webkit-text-stroke: 1px #ffffff;
-}
-.map {
-  color: #000000;
-  text-align: center;
-  font-family: "Stylish-Regular", sans-serif;
-  font-size: 25px;
-  font-weight: 400;
-  position: absolute;
-  left: 19.97px;
-  top: 335.39px;
-  width: 315.56px;
-  height: 104.41px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  -webkit-text-stroke: 1px #ffffff;
-} */
 .rectangle-28 {
   background: rgba(255, 255, 255, 0);
   border-style: solid;
@@ -848,7 +774,7 @@ aspect-ratio: 1;
 .rectangle-51 {
   background: #ffffff;
   width: 484px;
-  height: 770px;
+  height: 700px;
   position: absolute;
   left: 1433px;
   top: 170px;
@@ -934,7 +860,7 @@ aspect-ratio: 1;
   border-color: #d2d2d2;
   border-width: 1px;
   width: 369px;
-  height: 262px;
+  height: 130px;
   position: absolute;
   left: 1489px;
   top: 922px;
