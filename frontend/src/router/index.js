@@ -1,22 +1,3 @@
-// import { createRouter, createWebHistory } from 'vue-router';
-// import LoginComponent from "../components/LoginComponent.vue";
-// import MainComponent from "../components/MainComponent.vue";
-// import MyCategories from "../components/MyCategories.vue";
-// import MyPlaceComponent from "../components/MyPlaceComponent.vue";
-// import NewPlaceComponent from "../components/NewPlaceComponent.vue";
-// import MyPageComponent from "../components/MyPageComponent.vue";
-// import PlaceDetailComponent from "../components/PlaceDetailComponent.vue";
-
-// const routes = [
-//   { path: '/', component: LoginComponent },
-//   { path: '/main', component: MainComponent },
-//   { path: '/categories', component: MyCategories },
-//   { path: '/places', component: MyPlaceComponent },
-//   { path: '/new-place', component: NewPlaceComponent },
-//   { path: '/mypage', component: MyPageComponent },
-//   { path: '/place/:id', component: PlaceDetailComponent, props: true }
-// ];
-
 import { createRouter, createWebHistory } from 'vue-router';
 
 import BaseLayout from '@/components/common/BaseLayout.vue';
@@ -32,7 +13,13 @@ import LoginSuccessComponent from '@/components/LoginSuccessComponent.vue';
 
 const routes = [
   {
-    path: '/api/v1/', name: 'BaseLayout',component: BaseLayout,
+    path: '/',
+    redirect:'/api/v1'
+  },
+  {
+    path: '/api/v1',
+    name: 'BaseLayout',
+    component: BaseLayout,
     children: 
     [
       { path: '', name: 'Login', component: LoginComponent },                                 // 알림, btnLogin,  txtSearch, btnSearch, dropbutton
@@ -49,7 +36,7 @@ const routes = [
 ];
 
 const router = createRouter({
-  history: createWebHistory(),
+  history: createWebHistory(''),
   routes
 });
 
