@@ -12,6 +12,10 @@
     address: {
       type: String,
       default: ''
+    },
+    categories: {
+      type: Array,  // categoryId, name
+      default: () => []
     }
   });
 
@@ -81,6 +85,41 @@
       infoWindow.open(map, point);
     });
   };
+
+  // 기존 도형을 저장할 배열
+  let shapes = [];
+
+// categories가 바뀔 때마다 실행되는 watch
+watch(() => props.categories, (newCategories) => {
+  if (!map.value) return;
+
+  // 기존 도형 제거
+  shapes.forEach(shape => shape.setMap(null));
+  shapes = [];
+
+  console.log(newCategories);
+
+  // 새로운 도형 추가
+  newCategories.forEach((category, index) => {
+    // 카테고리의 좌표 (예시로 한강 근처, 실제 카테고리의 좌표로 대체)
+    const position = new window.naver.maps.LatLng(37.5112 + index * 0.001, 127 + index * 0.001); // 각 카테고리마다 위치를 달리 설정
+
+    // Marker를 사용하여 라벨을 표시
+    const marker = new window.naver.maps.Marker({
+      position: position,  // 마커 위치 (고정된 좌표)
+      map: map.value,  // 지도에 마커 추가
+      title: category.name,  // 마커의 title 속성에 라벨 텍스트 설정
+      icon: {
+        content: `<div style="background-color: white; border: 2px solid black; padding: 5px; border-radius: 5px;">${category.name}</div>`, // 라벨 스타일
+        size: new window.naver.maps.Size(100, 40), // 아이콘의 크기
+        anchor: new window.naver.maps.Point(50, 20) // 아이콘의 앵커 위치
+      }
+    });
+
+    // 마커를 shapes 배열에 저장
+    shapes.push(marker);
+  });
+});
 </script>
   
 <style scoped>
@@ -90,7 +129,6 @@
   .full {
     position: absolute;
     top: 95px;   
-    left: 350px;
   }
 
   #map {

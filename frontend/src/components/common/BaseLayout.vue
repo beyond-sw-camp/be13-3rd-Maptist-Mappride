@@ -30,8 +30,17 @@
           <option value="user">User</option>
       </select>
 
-      <input v-model="txtSearchModel" class="txtSearch" type="text" placeholder="Search..." />
-      <button @click="searchClick" class="btnSearch">search</button>
+      <input :value="txtSearchModel" class="txtSearch" type="text" placeholder="Search..." @input="txtChanging">
+      <ul v-if="filteredData.length > 0" class="lookupResults">
+        <li
+          v-for="(item, index) in filteredData" :key="index" @click="onItemSelect(item)" class="lookupItem">
+          {{ item.id + ' ' + item.name + ' ' + item.nickname }}
+        </li>
+      </ul>
+      <button class="btnSearch" @click="btnSearchClick">search</button>
+
+      <MainComponent :address="address.addressValue" :categories="categories.categoriesValue"/>
+
     </div>
 
     <div v-if="route.name === 'Categories' || route.name === 'Place'">
@@ -45,9 +54,7 @@
       <button class="btnLogout">logout</button>
     </div> -->
 
-    <button class="logout" v-if="route.path !== '/api/v1'" @click="logout">
-    logout
-  </button>
+    <button class="logout" v-if="route.path !== '/api/v1'" @click="logout"> logout </button>
     
     <div v-if="route.name === 'Login'">
       <input class="txtSearch" type="text" placeholder="Search..." />
@@ -55,8 +62,6 @@
       <button class="btnLogin">login</button>
     </div>
   </div>
-
-  <!-- <MainComponent :address="address.addressValue"/> -->
 
   <RouterView></RouterView>
 </template>
@@ -71,39 +76,68 @@
   const route = useRoute();
   const selectedOption = ref('address');
   const txtSearchModel = ref('');
-  const address = reactive({
-    addressValue: ''
-  });
+  const txtButtonModel = ref('');
+  const filteredData = ref([]);
+  const address = reactive({ addressValue: ''});
+  const categories = reactive({ categoriesValue: ''});
 
   const member = ref({});
 
   const logout = () => {
-  const isConfirmed = window.confirm("로그아웃 하시겠습니까?");
-  if (!isConfirmed) return; // 취소 시 아무 동작 안 함
-
-  localStorage.removeItem('accessToken'); // 토큰 삭제
-  router.push({ name: 'Login' }); // 로그인 페이지로 이동
-};
+   const isConfirmed = window.confirm("로그아웃 하시겠습니까?");
+   if (!isConfirmed) return; // 취소 시 아무 동작 안 함
+ 
+   localStorage.removeItem('accessToken'); // 토큰 삭제
+   router.push({ name: 'Login' }); // 로그인 페이지로 이동
+ };
 
   const searchClick = async () => {
     if (txtSearchModel.value.trim() === '') {
       alert('검색어를 입력해주세요.');
       return;
     }
+  };
 
+  const txtChanging = async (event) => {
     try {
       if (selectedOption.value === 'address') {
-        address.addressValue = txtSearchModel.value;
+        // address.addressValue = txtSearchModel.value;
       } else if (selectedOption.value === 'user') {
 
-        console.log("txtSearchModel.value" + txtSearchModel.value);
+        txtSearchModel.value = event.target.value;
 
-        // 경로 파라미터를 사용하여 요청 보내기
-        const response = await apiClient.get(`/api/v1/members/name/${txtSearchModel.value}`);
+        const response = await apiClient.get(`/members/name?name=${txtSearchModel.value}`);
 
-        console.log("status" + response.status);
-        console.log(response.data);
+        if (response.status === 200) {
+          filteredData.value = response.data;
+        } else {
+          console.error('API 요청 실패:', response.status);
+        }
       }
+    } catch (error) {
+      console.error('API 요청 실패:', error);
+      alert('검색 실패. 다시 시도해주세요.');
+    }
+  };
+
+  const onItemSelect = (item) => {
+    txtSearchModel.value = item.name;
+    txtButtonModel.value = item.id;
+    filteredData.value = [];
+  };
+
+  const btnSearchClick = async () => {
+    if(!txtButtonModel.value) return;
+
+    try {
+      const response = await apiClient.get(`/categories/${txtButtonModel.value}`);
+
+      if (response.status === 200) {
+        categories.categoriesValue = response.data;
+      } else {
+        console.error('API 요청 실패:', response.status);
+      }
+      
     } catch (error) {
       console.error('API 요청 실패:', error);
       alert('검색 실패. 다시 시도해주세요.');
@@ -303,6 +337,33 @@
   }  
   .txtSearch::placeholder {
     color: #d2d2d2; /* placeholder 텍스트 색상 설정 */
+  }
+  .lookupResults {
+    left: 352px;
+    top: 56px;
+    overflow-y: auto;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    position: absolute;
+    background-color: white;
+    width: 100%;
+    z-index: 1000;
+    width: 450px;
+  }
+
+  .lookupItem {
+    padding: 8px;
+    cursor: pointer;
+  }
+
+  .lookupItem:hover {
+    background-color: #f0f0f0;
+  }
+
+  .loading {
+    font-size: 14px;
+    color: gray;
+    padding-top: 5px;
   }
   .btnSearch {
     color: #000000;
