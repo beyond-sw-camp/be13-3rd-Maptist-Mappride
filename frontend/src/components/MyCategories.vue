@@ -12,7 +12,7 @@
 
         <div v-if="category.isModify">
           <input id="updateName" name="updateName" type="text" class="category-link" v-model="category.name">
-          
+
         </div>
           <!-- 라디오 버튼 -->
           <div class="radio-container">
@@ -213,31 +213,31 @@ export default {
       console.log("수정 버튼");
 
       // 카테고리 수정 전 상태 백업
-  if (!categories.value[index].originalCategory || categories.value[index].isModify === false) {
-    categories.value[index].originalCategory = { ...categories.value[index] }; // 수정 전 상태 백업
-  }
+      if (!categories.value[index].originalCategory || categories.value[index].isModify === false) {
+        categories.value[index].originalCategory = { ...categories.value[index] }; // 수정 전 상태 백업
+      }
 
-  categories.value[index].isModify = !categories.value[index].isModify;  // 수정 모드 토글
-};
+      categories.value[index].isModify = !categories.value[index].isModify;  // 수정 모드 토글
+    };
 
 // 수정 취소 버튼 클릭 시 원래 상태로 복원
-const resetCategory = (index) => {
-  // 수정 전 상태로 복원
-  const originalCategory = categories.value[index].originalCategory;
-  if (originalCategory) {
-    categories.value[index].name = originalCategory.name;
-    categories.value[index].publish = originalCategory.publish;
-    categories.value[index].isModify = false; // 수정 모드 해제
-  } else {
-    console.error('원래 카테고리 정보가 존재하지 않습니다.');
-  }
-};
+    const resetCategory = (index) => {
+      // 수정 전 상태로 복원
+      const originalCategory = categories.value[index].originalCategory;
+      if (originalCategory) {
+        categories.value[index].name = originalCategory.name;
+        categories.value[index].publish = originalCategory.publish;
+        categories.value[index].isModify = false; // 수정 모드 해제
+      } else {
+        console.error('원래 카테고리 정보가 존재하지 않습니다.');
+      }
+    };
 
 const deleteCategory = async (index) => {
   const categoryId = categories.value[index].id;
 
   // 확인 창을 띄워서 사용자가 삭제를 확인하면 삭제를 진행
-  const isConfirmed = confirm('진짜 지움?');
+  const isConfirmed = confirm('삭제 하시겠습니까?');
   if (isConfirmed) {
     try {
       await apiClient.delete(`/categories/${categoryId}`);

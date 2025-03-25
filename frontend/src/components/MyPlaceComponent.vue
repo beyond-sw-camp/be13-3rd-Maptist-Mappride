@@ -9,20 +9,12 @@
     <div class="address-dividing-line"></div>
     <div class="color-dividing-line"></div>
 
-    <ul class="place-list" >
+    <ul class="place-list">
       <li v-for="(place, index) in places" :key="index" class="place-item">
-        <a :href="place.url" class="place-link">{{ place.name }}</a>
+        <router-link :to="`/api/v1/place/${place.placeId}`" class="place-link">
+            {{ place.name }} 
+          </router-link>
         <div class="place-address">{{ place.placeAddress }}</div>
-        
-        <div class="button-container">
-          <img class="modify-image" v-if="!place.isModify" src="/src/assets/images/public/image-290.png" @click="modifyPlace(index)" />
-          <img class="delete-image" src="/src/assets/images/public/image-230.png" @click="deletePlace(index)" />
-        </div>
-
-        <div v-if="place.isModify">
-          <button @click="updateSubmit(place.name, index)" class="modify-submit">완료</button>
-          <button @click="resetPlace(index)" class="modify-reset">취소</button>
-        </div>
 
         <!-- 색상 드롭다운 -->
         <div class="dropdown-container-color" :class="{ open: colorDropdownVisible[index] }">
@@ -58,17 +50,54 @@
 </template>
   <script>
   import { ref, onMounted } from "vue";
-  import apiClient from "axios";
+  import apiClient from "@/api/axios.js";
+  import { useRoute } from "vue-router";
   
   export default {
     name: "Two",
     setup() {
       const route = useRoute();
-      const categoryId = route.params.categoryId;
-
       const places = ref([]);
-      const colorDropdownVisible = ref(new Array(places.value.length).fill(false));
-      const selectedClass = ref(new Array(places.value.length).fill("ellipse-2"));
+      const colorDropdownVisible = ref([]);
+      const selectedClass = ref([]);
+      const categoryId = ref(route.params.categoryId);
+      const apiUrl = `/categories/${categoryId}/places`;
+
+      // 페이지가 마운트되면 장소 데이터를 받아옴
+      onMounted(async () => {
+  try {
+    const categoryId = String(route.params.categoryId); // 문자열 변환
+    console.log("📌 변환된 categoryId:", categoryId, typeof categoryId);
+
+    const url = `/categories/${categoryId}/places`; // baseURL 적용됨
+    console.log("🚀 요청 URL:", url);
+
+    const response = await apiClient.get(url); // 비동기 요청
+    console.log("✅ 서버 응답 데이터:", response.data);
+
+    places.value = response.data;
+    console.log(places);
+    
+    initializeCategoryOptions(); // 데이터 로딩 후 초기화
+
+  } catch (error) {
+    console.error("❌ 에러 발생:", error);
+  }
+});
+
+      const initializeCategoryOptions = () => {
+        // places.value가 배열인지 확인 후에만 forEach 실행
+        if (Array.isArray(places.value)) {
+          places.value.forEach((place) => {
+            place.isModify = false;
+          });
+        }
+      };
+
+
+      
+      // const colorDropdownVisible = ref(new Array(places.value.length).fill(false));
+      // const selectedClass = ref(new Array(places.value.length).fill("ellipse-2"));
       const colors = ref([
         { className: "ellipse-2" },
         { className: "ellipse-3" },
@@ -88,43 +117,87 @@
       ]);
   
       // Axios로 데이터 받아오기
-      // const fetchPlaces = async () => {
-      //   try {
-      //     const response = await axios.get("API_URL"); // 여기에 실제 API URL을 넣어주세요
-      //     console.log("받은 데이터:", response.data);
-      //     places.value = response.data; // API에서 반환된 데이터로 places 값을 업데이트
-      //   } catch (error) {
-      //     console.error("데이터를 가져오는 데 실패했습니다:", error);
-      //   }
-      // };
+      const fetchPlaces = async () => {
+        try {
+          const response = await axios.get("API_URL"); // 여기에 실제 API URL을 넣어주세요
+          console.log("받은 데이터:", response.data);
+          places.value = response.data; // API에서 반환된 데이터로 places 값을 업데이트
+        } catch (error) {
+          console.error("데이터를 가져오는 데 실패했습니다:", error);
+        }
+      };
   
-      const initializeCategoryOptions = () => {
-          places.value.forEach((place) => {
-          place.isModify = false;
-      });
-    };
-      // 페이지가 마운트되면 장소 데이터를 받아옴
-      onMounted(() => {
-        apiClient.get('/places')
-        .then(response => {
-          console.log("서버 응답 데이터:", response.data); // 응답 데이터 확인
-          places.value = response.data;
-          initializeCategoryOptions(); // 데이터 로딩 후 초기화
-          
-        }).catch(error => {
-          console.error("에러 발생:", error);
-        });
-      }); 
+      
+      
   
       // 수정 및 삭제 기능
-      const editPlace = (index) => {
-        console.log(`수정 버튼 클릭: ${places.value[index].name}`);
-        alert(`장소 수정: ${places.value[index].name}`);
+      const modifyPlace = (index) => {
+      // 장소 수정 전 상태 백업
+        if (!places.value[index].originalPlaces || places.value[index].isModify === false) {
+          places.value[index].originalPlaces = { ...places.value[index] }; // 수정 전 상태 백업
+        }
+
+        places.value[index].isModify = !places.value[index].isModify;  // 수정 모드 토글
       };
-  
-      const deletePlace = (index) => {
-        console.log(`삭제 버튼 클릭: ${places.value[index].name}`);
-      };
+
+// 수정 취소 버튼 클릭 시 원래 상태로 복원  
+    const resetPlace = (index) => {
+       // 수정 전 상태로 복원
+      const originalPlaces = places.value[index].originalPlaces;
+      if (originalPlaces) {
+        places.value[index].name = originalPlaces.name;
+        places.value[index].publish = originalPlaces.publish;
+        places.value[index].isModify = false; // 수정 모드 해제
+      } else {
+        console.error('원래 장소 정보가 존재하지 않습니다.');
+      }
+    };
+
+    const updateSubmit = async(placeName, index) => {
+      // 중복된 이름 확인
+      const isDuplicate = places.value.some((place, idx) => place.name === placeName && idx !== index);
+
+    if (isDuplicate) {
+      alert('이미 존재하는 장소 이름입니다.');
+      places.value[index].name = places.value[index].originalPlaces.name;
+      places.value[index].isModify = false;
+      return;
+    }
+
+    const payload = {
+      id: places.value[index].id,
+      name: placeName,
+    };
+
+    try {
+      const response = await apiClient.put(`/place`, payload);
+      places.value[index].name = placeName;
+    } catch (error) {
+      console.error('장소 수정 실패:', error);
+    }
+
+    places.value[index].isModify = false;
+    }
+
+
+// 장소 삭제
+const deletePlace = async (index) => {
+  const placeId = places.value[index].id;  // 삭제할 장소의 id를 사용
+
+    const isConfirmed = confirm("진짜 지움?");
+    if (isConfirmed) {
+      try {
+        await apiClient.delete(`/api/v1/place/${placeId}`); // `placeId`로 삭제 요청
+        console.log(`🗑 삭제된 장소: ${places.value[index].name}`);
+        
+        places.value.splice(index, 1); // UI에서 해당 장소 삭제
+      } catch (error) {
+        console.error("❌ 장소 삭제 중 오류 발생:", error);
+      }
+    } else {
+      console.log("삭제 취소");
+    }
+  };
   
       // 색상 드롭다운 관련 함수
       const toggleColorDropdown = (index) => {
@@ -161,9 +234,13 @@
         toggleSortDropdown,
         setSortOrder,
         places,
-        editPlace,
         deletePlace,
         categoryId,
+        fetchPlaces,
+        categoryId,
+        resetPlace,
+        modifyPlace,
+        updateSubmit,
       };
     }
   };
@@ -750,6 +827,30 @@ button:hover {
   text-align: left;
   text-overflow: ellipsis;
   font-size: 20px; 
+  font-weight: 400;
+  text-decoration: none;
+}
+
+.modify-submit {
+  color: #000000;
+  width: 50px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis ;
+  font-size: 15px;
+  font-weight: 400;
+  text-decoration: none;
+  left: 100px;
+}
+.modify-reset {
+  color: #000000;
+  width: 50px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis ;
+  font-size: 15px;
   font-weight: 400;
   text-decoration: none;
 }
