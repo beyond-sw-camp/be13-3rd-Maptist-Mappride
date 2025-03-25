@@ -13,6 +13,7 @@
       <li v-for="(place, index) in places" :key="index" class="place-item">
         <a :href="place.url" class="place-link">{{ place.name }}</a>
         <div class="place-address">{{ place.placeAddress }}</div>
+        
         <div class="button-container">
           <img class="modify-image" v-if="!place.isModify" src="/src/assets/images/public/image-290.png" @click="modifyPlace(index)" />
           <img class="delete-image" src="/src/assets/images/public/image-230.png" @click="deletePlace(index)" />
@@ -20,7 +21,7 @@
 
         <div v-if="place.isModify">
           <button @click="updateSubmit(place.name, index)" class="modify-submit">완료</button>
-          <button class="modify-reset">취소</button>
+          <button @click="resetPlace(index)" class="modify-reset">취소</button>
         </div>
 
         <!-- 색상 드롭다운 -->
@@ -62,6 +63,9 @@
   export default {
     name: "Two",
     setup() {
+      const route = useRoute();
+      const categoryId = route.params.categoryId;
+
       const places = ref([]);
       const colorDropdownVisible = ref(new Array(places.value.length).fill(false));
       const selectedClass = ref(new Array(places.value.length).fill("ellipse-2"));
@@ -158,7 +162,8 @@
         setSortOrder,
         places,
         editPlace,
-        deletePlace
+        deletePlace,
+        categoryId,
       };
     }
   };

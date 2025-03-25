@@ -4,7 +4,10 @@
       <li v-for="(category, index) in categories" :key="index" class="category-item">
         <!-- 카테고리 이름 -->
          <div v-if="!category.isModify">
-          <a :href="category.url" class="category-link">{{ category.name }}</a>
+          <!-- <a :href="category.url" class="category-link">{{ category.name }}</a> -->
+          <router-link :to="`/api/v1/categories/${category.id}/places`" class="category-link">
+            {{ category.name }}
+          </router-link>
          </div>
 
         <div v-if="category.isModify">
