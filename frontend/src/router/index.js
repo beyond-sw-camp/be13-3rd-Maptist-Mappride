@@ -39,7 +39,7 @@ const routes = [
       { path: 'main', name: 'Main', component: MainComponent },                               // 알림, btnLogout, txtSearch, btnSearch, dropbutton
       { path: 'mypage', name: 'Mypage', component: MyPageComponent },                         // 알림, btnLogout
       { path: 'categories', name: 'Categories', component: MyCategories },                    // 알림, btnLogout, txtSearch, btnSearch, txtName
-      { path: 'places', name: 'Place', component: MyPlaceComponent },                         // 알림, btnLogout, txtSearch, btnSearch, txtName
+      { path: 'categories/:categoryId/places', name: 'Place', component: MyPlaceComponent },          // 알림, btnLogout, txtSearch, btnSearch, txtName
       { path: 'new-place', name: 'NewPlace', component: NewPlaceComponent },                  // 알림, btnLogout
       { path: 'place/:id', name: 'PlaceById', component: PlaceDetailComponent, props: true },  // 알림, btnLogout
       { path: "auth/login-success", component: LoginSuccessComponent },                       // 로그인 성공 처리
