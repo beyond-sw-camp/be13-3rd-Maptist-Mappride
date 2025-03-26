@@ -1,11 +1,11 @@
 <template>
   <div class="full">
     <ul class="category-list">
-      <li v-for="(category, index) in paginatedCategories" :key="index" class="category-item">
+      <li v-for="(category, index) in categories" :key="index" class="category-item">
         <!-- 카테고리 이름 -->
          <div v-if="!category.isModify">
           <!-- <a :href="category.url" class="category-link">{{ category.name }}</a> -->
-          <router-link :to="`/api/v1/categories/${category.id}/places`" class="category-link">
+          <router-link :to="`/api/v1/categories/${category.categoryId}/places`" class="category-link">
             {{ category.name }}
           </router-link>
          </div>
@@ -19,18 +19,16 @@
           <div 
             class="radio-option" 
             :class="{ selected: category.selectedOption === 'O' }" 
-            @click="category.selectedOption = 'O'">
+            @click="category.isModify && (category.selectedOption = 'O')">
             O
           </div>
           <div 
             class="radio-option" 
             :class="{ selected: category.selectedOption === 'X' }" 
-            @click="category.selectedOption = 'X'">
+            @click="category.isModify && (category.selectedOption = 'X')">
             X
           </div>
         </div>
-
-        
 
         <!-- 수정/삭제 버튼 -->
         <div class="button-container">
@@ -45,16 +43,17 @@
       </li>
     </ul>
 
+    
+
     <!-- 페이지네이션 버튼 -->
-    <div class="pagination">
-          <button @click="prevPage" :disabled="currentPage === 1">Previous</button>
-          <span>Page {{ currentPage }} of {{ totalPages }}</span>
-          <button @click="nextPage" :disabled="currentPage === totalPages">Next</button>
-        </div>
+    <!-- <div class="pagination">
+      <button @click="prevPage" :disabled="currentPage === 1">Previous</button>
+      <span>Page {{ currentPage }} of {{ totalPages }}</span>
+      <button @click="nextPage" :disabled="currentPage === totalPages">Next</button>
+    </div> -->
 
     <div class="search-box">
-
-      <form @submit.prevent="handleSubmit">
+      <form @submit.prevent="btnSearchClick">
     <input 
       type="text" 
       class="new-category" 
@@ -90,20 +89,25 @@
 
     <div class="title-dividing-line"></div>
     <div class="publish-dividing-line"></div>
-
-    
   </div>
 </template>
 <script>
 import apiClient from '@/api/axios.js';
-import { ref, onMounted,computed } from 'vue';
+import { ref, onMounted,computed, watch,  } from 'vue';
 
 export default {
   name: "MyCategories",
-  setup() {
+  props: {
+    searchQuery: {
+      type: String,
+      default: ''
+    }
+  },
+  setup(props) {
     const newCategoryName = ref('');  // 카테고리 이름 입력
     const newSelectedOption = ref('O');  // 기본적으로 X로 설정
     const categories = ref([]);  // 기존 카테고리 목록
+    // const filteredCategories = ref([]);  // 필터링된 카테고리 목록
     const updateName = ref('');
 
     // 페이지네이션 관련 변수
@@ -111,13 +115,24 @@ export default {
       const itemsPerPage = 8;      // 한 페이지당 항목 수
       const totalPages = ref(1);   // 총 페이지 수
 
-    // 페이지네이션에 맞는 데이터만 표시하도록 처리
-    const paginatedCategories = computed(() => {
-      const startIndex = (currentPage.value - 1) * itemsPerPage;
-      const endIndex = startIndex + itemsPerPage;
-      return categories.value.slice(startIndex, endIndex);
-    });
+      // 검색 관련 변수
+    // const filteredCategories = ref([]);
 
+    // 페이지네이션에 맞는 데이터만 표시하도록 처리
+    // const paginatedCategories = computed(() => {
+    //   const startIndex = (currentPage.value - 1) * itemsPerPage;
+    //   const endIndex = startIndex + itemsPerPage;
+    //   return categories.value.slice(startIndex, endIndex);
+    // });
+
+    // // 페이지네이션을 고려하여 표시할 카테고리 목록
+    // const paginatedCategories = computed(() => {
+    //   const startIndex = (currentPage.value - 1) * itemsPerPage;
+    //   const endIndex = startIndex + itemsPerPage;
+    //   return categories.value.slice(startIndex, endIndex);
+    // });
+
+    
     // 페이지 이동 함수
     const nextPage = () => {
         if (currentPage.value < totalPages.value) {
@@ -131,6 +146,34 @@ export default {
         }
       };
 
+      const fetchCategories = async () => {
+      try {
+        const response = await apiClient.get('/categories');
+        if (response.status === 200) {
+          categories.value = response.data;
+          totalPages.value = Math.ceil(categories.value.length / itemsPerPage);
+        }
+      } catch (error) {
+        console.error('카테고리 목록을 가져오는 데 실패했습니다:', error);
+      }
+    };
+
+    // // 검색 버튼 클릭 시 호출되는 함수
+    // const btnSearchClick = () => {
+    //   filteredCategories.value = categories.value.filter(category =>
+    //     category.name.includes(searchQuery.value)
+    //   );
+    //   totalPages.value = Math.ceil(filteredCategories.value.length / itemsPerPage);
+    //   currentPage.value = 1; // 검색 시 페이지를 1로 리셋
+    // };
+
+    // 검색 버튼 클릭 시 처리
+    const btnSearchClick = () => {
+      filteredCategories.value = categories.value.filter(category => category.name.includes(newCategoryName.value));
+      currentPage.value = 1; // 검색 시 페이지를 1로 리셋
+      totalPages.value = Math.ceil(filteredCategories.value.length / itemsPerPage); // 검색 후 총 페이지 수 업데이트
+    };
+
 
     const initializeCategoryOptions = () => {
         categories.value.forEach((category) => {
@@ -138,8 +181,18 @@ export default {
         category.isModify = false;
       });
     };
+
+    // const filteredCategories = computed(() => {
+    //   return categories.value.filter(category =>
+    //     category.name.includes(props.searchQuery)
+    //   );
+    // });
+
+
+
     // 서버에서 카테고리 목록을 가져오는 함수
     onMounted(() => {
+      fetchCategories();
       apiClient.get('/categories')
       .then(response => {
         console.log("서버 응답 데이터:", response.data); // 응답 데이터 확인
@@ -179,12 +232,13 @@ export default {
         
         
         // 서버에서 반환된 카테고리 데이터로 새 카테고리 추가
-        // categories.value.push(response.data);
-        categories.value.push(newCategory);
+        categories.value.push(response.data);
+        filteredCategories.value = categories.value;
 
         // 추가 후, 입력 필드 초기화
         newCategoryName.value = '';
         newSelectedOption.value = 'X'; // 기본값으로 초기화
+        totalPages.value = Math.ceil(filteredCategories.value.length / itemsPerPage);
 
         initializeCategoryOptions();
       } catch (error) {
@@ -218,16 +272,20 @@ export default {
 
 
       const payload = {
-        id: categories.value[index].id,
+        id: categories.value[index].categoryId,
         name: categoryName,
-        publish: publish
+        publish: categories.value[index].selectedOption === 'O' ? 'true' : 'false' // 
+        // publish: publish
+        // publish: categories.value[index].publish
       };
 
 
       try {
         const response = await apiClient.put('/categories/update', payload);
         categories.value[index].name = categoryName;
-        categories.value[index].publish = publish;
+        categories.value[index].publish = categories.value[index].selectedOption === 'O'; // 'O'일 경우 true
+        // categories.value[index].publish = publish === 'true'; 
+        // categories.value[index].publish = response.data.publish;
       
     } catch(error) {
         console.error('카테고리 수정 실패:', error);
@@ -264,7 +322,7 @@ export default {
     };
 
 const deleteCategory = async (index) => {
-  const categoryId = categories.value[index].id;
+  const categoryId = categories.value[index].categoryId;
 
   // 확인 창을 띄워서 사용자가 삭제를 확인하면 삭제를 진행
   const isConfirmed = confirm('삭제 하시겠습니까?');
@@ -282,6 +340,12 @@ const deleteCategory = async (index) => {
   }
 };
 
+// categories가 변경되거나 searchQuery가 변경될 때 페이지네이션을 재계산
+// watch([filteredCategories, props.searchQuery], () => {
+//       currentPage.value = 1; // 검색 시 페이지를 1로 리셋
+//       totalPages.value = Math.ceil(filteredCategories.value.length / itemsPerPage);
+//     });
+
     return {
       newCategoryName,
       newSelectedOption,
@@ -292,12 +356,13 @@ const deleteCategory = async (index) => {
       updateSubmit,
       updateName,
       resetCategory,
-      paginatedCategories,
+      // paginatedCategories,
       currentPage,
       totalPages,
       nextPage,
       prevPage,
-
+      // filteredCategories,
+      btnSearchClick
     };
   },
 };

@@ -19,6 +19,11 @@
       </li>
     </ul>
 
+    <!-- 뒤로가기 버튼 -->
+    <div class="backitem" @click="goback">
+      <a class="backlink">. . . /</a>
+    </div>
+
     <!-- 페이지네이션 버튼 -->
     <div class="pagination">
       <button @click="prevPage" :disabled="currentPage === 1">Previous</button>
@@ -47,12 +52,13 @@
   <script>
   import { ref, onMounted,computed } from "vue";
   import apiClient from "@/api/axios.js";
-  import { useRoute } from "vue-router";
+  import { useRoute, useRouter } from "vue-router";
   
   export default {
     name: "Two",
     setup() {
       const route = useRoute();
+      const router = useRouter();
       const places = ref([]);
       // const colorDropdownVisible = ref([]);
       // const selectedClass = ref([]);
@@ -70,7 +76,13 @@
         return places.value.slice(startIndex, endIndex);
       });
 
+      // 현재 URL에서 categoryName을 가져옴
+      const categoryName = computed(() => route.params.categoryName || ". . . /");
+
       
+      const goback = () => {
+        router.go(-1); // 이전 페이지로 이동
+      };
 
       // 페이지가 마운트되면 장소 데이터를 받아옴
       onMounted(async () => {
@@ -200,12 +212,6 @@
         sortBy(option.value);  // 정렬 함수 실행
       };
 
-      
-
-
-
-
-  
       return {
         places,
         paginatedPlaces,
@@ -218,7 +224,9 @@
         sortOptions,
         selectedSortImage,
         toggleSortDropdown,
-        setSortOrder
+        setSortOrder,
+        goback,
+        categoryName,
       };
     }
   };
@@ -823,6 +831,7 @@ button:hover {
   position: relative;
   bottom: 1155px;
   left: 5px;
+  bottom: 1070px;  /* 높이조절*/
 }
 
 /* 📍 place-link 폰트 크기 조정 */
@@ -914,8 +923,9 @@ button:hover {
   display: flex;
   position: absolute;
   justify-content: center;
-  margin-top: -1150px;
+  margin-top: 0px;
   left: 1000px;
+  top: 1000px;
   /* bottom: 500px; */
 }
 
@@ -928,6 +938,35 @@ button:hover {
 .pagination span {
   align-self: center;
   margin: 0 10px;
+}
+
+.backitem {
+  background: #ffffff;
+  border-style: solid;
+  border-color: #d2d2d2;
+  border-width: 1px;
+  width: 1552px;
+  height: 65px;
+  position: absolute;
+  left: 346px;
+  top: 155px;
+  align-content: center;
+  padding-left: 10px;
+}
+
+/* 📍 place-link 폰트 크기 조정 */
+.backlink {
+  color: #000000;
+  width: 250px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-align: left;
+  text-overflow: ellipsis;
+  font-size: 20px; 
+  font-weight: 400;
+  text-decoration: underline 2px;
+  cursor: pointer;
+  text-underline-offset: 4px;
 }
 
 </style>
