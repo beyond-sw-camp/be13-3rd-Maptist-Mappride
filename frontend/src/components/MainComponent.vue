@@ -243,7 +243,7 @@ const onCategoryButtonClick = async (category) => {
 .full {
   position: absolute;
   top: 95px;
-  left: 350px;
+  /* left: 350px; */
 }
 
 #map {
