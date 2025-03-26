@@ -183,10 +183,8 @@ const onCategoryButtonClick = async (category) => {
           }
         });
 
-        console.log(place.placeId);
 
-
-        
+        console.log(place);
 
 
 
