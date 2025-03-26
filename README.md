@@ -1,4 +1,4 @@
-# MapPride - by Maptist
+# MAPPRIDE - by MAPTIST
 <br>
 
 ![mapbusim_logo_resized](https://github.com/user-attachments/assets/0d400c83-0645-4262-a42f-95163a2db7bb)
@@ -15,12 +15,12 @@
 
 # 프로젝트 개요
 
-<사용자 맞춤형 지도를 제작할 수 있는 웹 애플리케이션>
+`사용자 맞춤형 지도를 제작 및 공유할 수 있는 웹 애플리케이션`
 
 (자기지도에 핑찍은 사진)
-
+**
 - 자신의 카테고리와 카테고리에 포함된 장소들을 지도 상에서 쉽게 관리
-- 위치 정보와 카테고리를 기반으로 장소를 추가, 수정, 삭제
+- 위치 정보와 카테고리를 기반으로 장소를 추가, 수정, 삭제**
 
 ===== 여기부터 멋지게 써보자잉=================
 
@@ -72,7 +72,7 @@
 <br>
 ![git](https://github.com/user-attachments/assets/d04521ee-046d-41dd-ac18-1b7f40dd38ed) ![github](https://github.com/user-attachments/assets/6e0d5234-61c3-4fda-80b4-c54f7b058b57)
  
- ### developing tool
+ ### Developing tool
 <br>
 ![intellij](https://github.com/user-attachments/assets/25d426ed-e30e-4619-9968-11375adba8b9) ![vscode](https://github.com/user-attachments/assets/c9563ad4-0d59-4647-a204-bbedf1ba9479) 
 
@@ -97,8 +97,9 @@
 <br><br>
 
 ### ERD
-![erd](https://github.com/user-attachments/assets/b857a80d-a35c-4338-a02c-6b4876890baf)
+<br>
 
+![erd](https://github.com/user-attachments/assets/b857a80d-a35c-4338-a02c-6b4876890baf)
 
 <br><br>
 
