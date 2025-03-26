@@ -13,8 +13,7 @@
 </template>
 
 <script setup>
-import { defineProps, onMounted, watch, ref, computed } from 'vue';
-import { usePiniaStore } from '@/stores/pinia.js';
+import { defineProps, onMounted, watch, ref } from 'vue';
 import apiClient from '@/api/axios.js';
 
 // 부모 컴포넌트로부터 전달된 주소를 받을 prop
@@ -22,16 +21,19 @@ const props = defineProps({
   address: {
     type: String,
     default: ''
+  },
+  categories: {
+    type: Array,  // categoryId, name
+    default: () => []
   }
 });
 
 // map 객체를 ref로 정의
 const map = ref(null);
-
 // 네이버 지도 API 로드 및 지도 생성
 onMounted(() => {
   const script = document.createElement("script");
-  script.src = "https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=p5ju3wcg2n&submodules=geocoder";
+  script.src = "https://openapi.map.naver.com/openapi/v3/maps.js?ncpClientId=p5ju3wcg2n";
   script.async = true;
   script.defer = true;
   document.head.appendChild(script);
@@ -43,65 +45,53 @@ onMounted(() => {
       zoom: 13
     });
   };
+  console.log("지도가 초기화되었습니다.", map.value)
 });
 
 // watch로 address 값 변경을 감지하여 실시간으로 지도에 반영
 watch(() => props.address, (newAddress) => {
     if (newAddress && map.value) {
+      console.log('in main', newAddress);
       searchAddressToCoordinate(newAddress, map.value);
     }
 });
+// 최유진 필독!!!! 
+// watch -> searchAddressToCoordinate 
+// -> 서버에서 getMapping으로 좌표 가져옴
+// -> 좌표 lng, lat에 저장 -> newPosition에 저장
+// -> map.setCenter(newPosition)으로 위치 이동 -> 줌 확대
+// -> 끝! 마커 표시필요함함
+const searchAddressToCoordinate = async(address, map) => {
+  try {
+    const res = await apiClient.get('/geocode', {
+      params: { address: address }
+    })
+    console.log('res.data:',res.data)
+    const { lng, lat } = res.data
 
-// 주소로 좌표를 찾고 지도의 중심을 해당 좌표로 이동하는 함수
-const searchAddressToCoordinate = (address, map) => {
-    window.naver.maps.Service.geocode({
-      query: encodeURIComponent(address) // 주소를 인코딩하여 전송
-    }, function(status, response) {
-      console.log(status);
-      console.log(response);
+    if (!lat || !lng) {
+      throw new Error("좌표가 유효하지 않습니다.")
+    }
 
-      // API 호출 상태 확인
-      if (status === window.naver.maps.Service.Status.ERROR) {
-        alert('Something went wrong! Server error');
-        return;
-      }
+    const newPosition = new naver.maps.LatLng(lat, lng);
 
-      if (response.v2.meta.totalCount === 0) {
-        alert('No results found for the address');
-        return;
-      }
+    // 지도 중심 이동
+    map.setCenter(newPosition);
 
-      const item = response.v2.addresses[0];
-      const point = new window.naver.maps.Point(item.x, item.y);
+    // 줌 레벨 조정 (예: 17로 확대)
+    map.setZoom(17);
 
-      // 지도 중심을 좌표로 이동
-      map.setCenter(point);
-
-      // // 주소 정보 표시
-      // const infoWindow = new window.naver.maps.InfoWindow({
-      //   content: [
-      //     '<div style="padding:10px;min-width:200px;line-height:150%;">',
-      //     <h4 style="margin-top:5px;">검색 주소 : ${address}</h4><br />,
-      //     [도로명 주소] ${item.roadAddress || ''}<br />,
-      //     [지번 주소] ${item.jibunAddress || ''}<br />,
-      //     [영문명 주소] ${item.englishAddress || ''},
-      //     '</div>'
-      //   ].join('\n')
-      // });
-      infoWindow.open(map, point);
-    });
-  };
+  } catch (error) {
+    alert('주소를 찾을 수 없습니다.')
+    console.error(error)
+  }  
+}
 
 // 마커와 관련된 정보창을 저장할 배열
 let markers = [];
 
-// Pinia store에서 category 값을 가져옵니다
-const piniaStore = usePiniaStore();
-
-const categoryItems = computed(() => piniaStore.categories);
-
 // 카테고리가 바뀔 때마다 실행되는 watch
-watch(() => categoryItems.value, (newCategories) => {
+watch(() => props.categories, (newCategories) => {
   if (!map.value) return;
 
   // 기존 마커들과 정보창 삭제
@@ -180,17 +170,22 @@ const onCategoryButtonClick = async (category) => {
           title: place.name,
           icon: {
             url: "http://static.naver.com/maps2/icon/marker/marker_blue.png",  // 기본 마커 아이콘
-            size: new naver.maps.Size(60, 80),  // 아이콘 크기 (너비: 40px, 높이: 60px)
+            size: new naver.maps.Size(40, 60),  // 아이콘 크기 (너비: 40px, 높이: 60px)
             anchor: new naver.maps.Point(20, 60)  // 마커의 중심을 아이콘의 하단으로 맞추기
           }
         });
 
+
+        console.log(place);
+
+
+
         // 정보 창 내용 구성
         const contentString = [
-        '<div class="iw_inner" style="width: 350px; height: 300px; padding: 5px; font-size: 20px;">',
+          '<div class="iw_inner">',
           `   <h3>${place.name}</h3>`,
           `   <p>${place.address}<br />`,
-          `       <img src="${place.photoUrl || './img/example/hi-seoul.jpg'}" width="280" height="100" alt="${place.name}" class="thumb" /><br />`,
+          `       <img src="${place.image || './img/example/hi-seoul.jpg'}" width="55" height="55" alt="${place.name}" class="thumb" /><br />`,
           `       ${place.phone || ''}<br />`,
           `       <a href="${place.website || '#'}" target="_blank">${place.website || '웹사이트 없음'}</a>`,
           '   </p>',
@@ -212,7 +207,7 @@ const onCategoryButtonClick = async (category) => {
 
           const point = new naver.maps.LatLng(place.latitude, place.longitude);
             map.value.setCenter(point);  // 해당 위치로 지도 중심 이동
-            map.value.setZoom(16);
+            map.value.setZoom(15);
         });
 
         // 생성한 마커와 정보창을 markers 배열에 저장
