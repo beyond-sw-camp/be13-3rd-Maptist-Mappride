@@ -48,8 +48,8 @@
     <div v-if="route.name === 'Categories' || route.name === 'Place'">
       <div class="lblName">name</div>
 
-      <input class="txtSearch" type="text" placeholder="Search..." />
-      <button class="btnSearch">search</button>
+      <input v-model="searchQuery" class="txtSearch" type="text" placeholder="Search..." />
+      <button class="btnSearch" @click="emitSearch">search</button>
     </div>
 
     <!-- <div v-if="route.name !== 'Login'">
@@ -65,6 +65,7 @@
     </div>
   </div>
 
+  <!-- <RouterView :searchQuery="searchQuery" /> -->
   <RouterView></RouterView>
 
 
@@ -85,6 +86,12 @@
   const filteredData = ref([]);
   const address = reactive({ addressValue: ''});
   const categories = reactive({ categoriesValue: ''});
+  const searchQuery = ref('');
+
+  const emitSearch = () => {
+    // Search function when button is clicked
+    console.log("검색 실행:", searchQuery.value);
+  };
 
   const logout = () => {
    const isConfirmed = window.confirm("로그아웃 하시겠습니까?");
@@ -171,7 +178,20 @@
         } else {
           console.error('API 요청 실패:', response.status);
         }
-      }
+      } 
+      
+      // else if (selectedOption.value === 'category') {  // 카테고리 검색 추가
+      //   if (!txtSearchModel.value) return;
+        
+      //   const response = await apiClient.get(`/categories/search?query=${txtSearchModel.value}`);
+
+      //   if (response.status === 200) {
+      //     categories.categoriesValue = response.data;
+      //   } else {
+      //     console.error('카테고리 검색 API 요청 실패:', response.status);
+      //   }
+      // }
+
     } catch (error) {
       console.error('API 요청 실패:', error);
       alert('검색 실패. 다시 시도해주세요.');
