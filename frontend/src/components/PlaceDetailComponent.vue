@@ -74,42 +74,47 @@
     <img class="image-39" src="/src/assets/images/placeDetailComponent/image-390.png" />
     <div class="rectangle-51"></div>
 
-    <!-- perp 댓글 조회, 수정, 삭제 -->
-    <!-- <div v-for="(comment, index) in comments" :key="index" class="comment-item">
-    <div class="comment-id">{{ comment.id }}</div>
-    <div class="comment-content">{{ comment.content }}</div>
-    <div class="comment-date">{{ comment.date }}</div>
-
-    <button type = "button" @click="editComment(index)">
-      <img class="image-49" src="/src/assets/images/public/image-290.png" />
-    </button>
-    <button @click.stop="cconfirmDelete(index)">
-      <img class="image-50" src="/src/assets/images/public/image-230.png" />
-    </button>
-    </div> -->
+    
 
     <!-- 뉴 comments -->
     <!-- <ul style="list-style-type: none; margin: 0; padding: 0;">  일반적으로 -->
     <div class="rectangle-51">
     <ul style="list-style-type: none;">
       <li v-for="(comment, index) in comments" :key="index" class="comment-item">
-        <div class="comment-memberId">{{ comment.memberId }}</div>
+        <div class="comment-memberName">{{ comment.memberName }}</div>
         <div class="comment-content">{{ comment.comment }}</div>
-        <!-- 벡엔드에서 추가 필요?
-        <div class="comment-date">{{ comment.date }}</div> -->
+        <div class="comment-date">{{ comment.regDate }}</div>
 
-        <!-- 댓글 버튼 -->
-        <!-- 로그인된 사용자와 댓글 작성자가 같을 때만 버튼 표시 -->
-        <div v-if="member.id === commentMemberId" class="comment-actions">
-        
-          <button type = "button" @click="editComment(index)">
-          <img class="image-49" src="/src/assets/images/public/image-290.png" />
-          </button>
-          <button @click.stop="cconfirmDelete(index)">
-          <img class="image-50" src="/src/assets/images/public/image-230.png" />
-          </button>
-
+        <!-- 댓글 작성자와 로그인된 사용자 ID 비교 -->
+        <div v-if="member.id === comment.memberId" class="comment-actions">
+          <!-- 내가 작성한 댓글 텍스트 -->
+          <div class="my-comment-text">내가 작성한 댓글</div>
+          <!-- 버튼 영역 -->
+          <div class="button-container">
+            <!-- 수정 버튼 -->
+            <button type="button" @click="editComment(index)" class="transparent-button">
+              <img src="/src/assets/images/public/image-290.png" />
+            </button>
+            <!-- 삭제 버튼 -->
+            <button @click.stop="cconfirmDelete(index)" class="transparent-button">
+              <img src="/src/assets/images/public/image-230.png" />
+            </button>
+          </div>
         </div>
+
+        <!-- old 댓글 작성자와 로그인된 사용자 ID 비교 -->
+        <!-- <div v-if="member.id === comment.memberId" class="comment-actions">
+          <div class="my-comment-text">내가 작성한 댓글</div>
+          <button type="button" @click="editComment(index)">
+            <img class="image-49" src="/src/assets/images/public/image-290.png" />
+          </button>
+          
+          <button @click.stop="cconfirmDelete(index)">
+            <img class="image-50" src="/src/assets/images/public/image-230.png" />
+          </button>
+        </div> -->
+
+        
       </li>
     </ul>
     </div>
@@ -139,8 +144,8 @@
     <!-- 구 댓글창 -->
     
     <!-- <div class="line-18"></div>
-    <div class="line-21"></div>
     <div class="div5">내가 작성한 댓글</div>
+    <div class="line-21"></div>
     <div class="div6">사장님이 친절해요</div>
     <div class="line-19"></div>
     <div class="line-20"></div>
@@ -187,10 +192,6 @@
 </template>
 
 <script setup>
-// 원래 코드
-// import { onMounted, reactive, ref, watch } from 'vue';
-
-// 디스코드 연결 코드 수정본 + perp
 import apiClient from '@/api/axios.js';
 import { ref, onMounted } from 'vue';
 import { useRoute } from 'vue-router';
@@ -199,15 +200,16 @@ import { useRoute } from 'vue-router';
 const route = useRoute();
   const comments = ref([]);
   const member = ref([]);
-  const placeId = ref(''); // placeId를 저장할 변수
-  const commentMemberId = ref('');
+  const placeId = ref('');
+  // const commentMemberId = ref('');
   
   onMounted(async() => {
     
       placeId.value = String(route.params.placeId);
-      console.log(String(route.params.placeId));
-      
-      console.log(placeId.value);
+
+      // placeId 잘 받아오는지 확인
+      // console.log(String(route.params.placeId));
+      // console.log(placeId.value);
 
       apiClient.get(`/comments/${placeId.value}`).then(response => {
         comments.value = response.data;
@@ -228,60 +230,13 @@ const route = useRoute();
   });
   
   
-  // 보류
-  // perp fetchmember 버전 수정
-//   const fetchCommmetsData = async () => {
-//   try {
-//     const response = 
-//     await apiClient.get(`/comments/${place-id}`).then((response) => {
-//           console.log(response);
-//       })
-//       // 비동기 통신이 실패했을 때 호출되는 함수를 지정한다.
-//       .catch((error) => {
-//           console.log(error);
-//       });;
-//     comments.value = response.data; // API 응답 데이터를 저장
-//   } catch (error) {
-//     console.error('댓글 데이터를 가져오는 중 오류 발생:', error);
-//   }
-// };
-
-// onMounted(() => {
-//   fetchCommmetsData(comments.value);
-  
-// });
-
-// 삭제 예정
-// // 뉴 댓글 데이터 가져오기
-// const fetchComments = async () => {
-//   try {
-//     // const response = await apiClient.get(`/api/v1/comment/${placeId}`);
-//     const response = await apiClient.get(`/api/v1/comment/{place-id}`);
-//     comments.value = response.data.items; // API에서 받은 댓글 데이터
-//   } catch (error) {
-//     console.error('댓글 데이터를 가져오는 중 오류 발생:', error);
-//   }
-// };
-
-// 기본 comment onmounted
-// onMounted(() => {
-//     apiClient.get(`/comments/${place-id}`).then(response => {
-//       comments.value = response.data;
-//     }).catch(error => {
-//       console.error("댓글 데이터 로딩 중 오류 발생", error);
-//     });
-//   });
-
-
-
-
 
 // 뉴 댓글 수정
 const editComment = (index) => {
   // const newContent = prompt('댓글 내용을 수정하세요:', comments.value[index].content);
-  const newContent = prompt(comments.value[index].content);
-  if (newContent) {
-    comments.value[index].content = newContent;
+  const newComment = prompt(comments.value[index].comment);
+  if (newComment) {
+    comments.value[index].content = newComment;
     // 서버에 수정 요청 추가 가능
   }
 };
@@ -407,7 +362,39 @@ const showImage47 = ref(false);
   overflow: hidden;
 }
 
+.comment-actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
 
+.button-container {
+  display: flex;
+  justify-content: flex-end; /* 버튼을 오른쪽 끝으로 정렬 */
+  gap: 5px; /* 버튼 간 간격 */
+}
+
+.transparent-button {
+  background: transparent; /* 투명한 배경 */
+  border: none; /* 테두리 제거 */
+  width: 27px; /* 고정 너비 */
+  height: 27px; /* 고정 높이 */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.transparent-button img {
+  width: 100%; /* 이미지 크기 버튼에 맞게 조정 */
+  height: auto;
+}
+
+/* 내가 작성한 댓글 표시 */
+.my-comment-text {
+  color: #4285f4;
+  font-size: 12px;
+  margin-bottom: 5px;
+}
 .rectangle-4 {
   background: #ffffff;
   border-style: solid;
@@ -783,12 +770,13 @@ aspect-ratio: 1;
   overflow: scroll;
 }
 
+/* 댓글 양식 */
 .comment-item {
   border-bottom: 1px solid #ddd;
   padding: 10px 0;
 }
 
-.comment-author {
+.comment-memberName {
   font-weight: bold;
 }
 
@@ -805,7 +793,7 @@ aspect-ratio: 1;
   margin-right: 5px;
 }
 
-/* perp 댓글 종료 */
+
 
 .line-21 {
   margin-top: -1px;
@@ -826,7 +814,7 @@ aspect-ratio: 1;
   font-weight: 400;
   position: absolute;
   left: 1760px;
-  top: 403px;
+  top: 200px;
   width: 112px;
   height: 24px;
 }
