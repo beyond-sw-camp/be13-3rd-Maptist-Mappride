@@ -56,9 +56,9 @@ _(자기지도에 핑찍은 사진)_
 
 ##### 기존의 어플리케이션
 
-![화면 캡처 2025-03-26 110007](https://github.com/user-attachments/assets/148161bc-7f94-48fc-beb3-2c0a5b90adf2)
+![화면 캡처 2025-03-26 110007_resized](https://github.com/user-attachments/assets/d9dce397-fd75-420b-8f60-a7b4be138b1d)
 
-![화면 캡처 2025-03-26 110052](https://github.com/user-attachments/assets/b44d16ab-3ea8-4acc-ac50-8d3c95b34771)
+![화면 캡처 2025-03-26 110052_resized](https://github.com/user-attachments/assets/17238fb3-87f0-4fa5-9d52-13138bfb1bf9)
 
 
 - 원래 지도를 길찾기 용도로 많이 쓰지만 이건 나만의 장소를 저장하는데 중점을 둠
