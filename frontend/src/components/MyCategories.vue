@@ -1,7 +1,7 @@
 <template>
   <div class="full">
     <ul class="category-list">
-      <li v-for="(category, index) in categories" :key="index" class="category-item">
+      <li v-for="(category, index) in paginatedCategories" :key="index" class="category-item">
         <!-- 카테고리 이름 -->
          <div v-if="!category.isModify">
           <!-- <a :href="category.url" class="category-link">{{ category.name }}</a> -->
@@ -28,8 +28,9 @@
             @click="category.selectedOption = 'X'">
             X
           </div>
-          
         </div>
+
+        
 
         <!-- 수정/삭제 버튼 -->
         <div class="button-container">
@@ -43,6 +44,13 @@
         </div>
       </li>
     </ul>
+
+    <!-- 페이지네이션 버튼 -->
+    <div class="pagination">
+          <button @click="prevPage" :disabled="currentPage === 1">Previous</button>
+          <span>Page {{ currentPage }} of {{ totalPages }}</span>
+          <button @click="nextPage" :disabled="currentPage === totalPages">Next</button>
+        </div>
 
     <div class="search-box">
 
@@ -73,10 +81,6 @@
       </div>
     </div>
   </form>
-      
-      
-      
-      
 
     </div>
 
@@ -92,7 +96,7 @@
 </template>
 <script>
 import apiClient from '@/api/axios.js';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted,computed } from 'vue';
 
 export default {
   name: "MyCategories",
@@ -101,6 +105,31 @@ export default {
     const newSelectedOption = ref('O');  // 기본적으로 X로 설정
     const categories = ref([]);  // 기존 카테고리 목록
     const updateName = ref('');
+
+    // 페이지네이션 관련 변수
+    const currentPage = ref(1);  // 현재 페이지
+      const itemsPerPage = 8;      // 한 페이지당 항목 수
+      const totalPages = ref(1);   // 총 페이지 수
+
+    // 페이지네이션에 맞는 데이터만 표시하도록 처리
+    const paginatedCategories = computed(() => {
+      const startIndex = (currentPage.value - 1) * itemsPerPage;
+      const endIndex = startIndex + itemsPerPage;
+      return categories.value.slice(startIndex, endIndex);
+    });
+
+    // 페이지 이동 함수
+    const nextPage = () => {
+        if (currentPage.value < totalPages.value) {
+          currentPage.value++;
+        }
+      };
+
+      const prevPage = () => {
+        if (currentPage.value > 1) {
+          currentPage.value--;
+        }
+      };
 
 
     const initializeCategoryOptions = () => {
@@ -117,6 +146,7 @@ export default {
         categories.value = response.data;
         initializeCategoryOptions(); // 데이터 로딩 후 초기화
         
+      totalPages.value = Math.ceil(categories.value.length / itemsPerPage);  // 총 페이지 수 계산
       }).catch(error => {
         console.error("에러 발생:", error);
       });
@@ -262,6 +292,12 @@ const deleteCategory = async (index) => {
       updateSubmit,
       updateName,
       resetCategory,
+      paginatedCategories,
+      currentPage,
+      totalPages,
+      nextPage,
+      prevPage,
+
     };
   },
 };
@@ -663,6 +699,27 @@ img {
   width: 25px;   /* 버튼 크기 조정 */
   height: 25px;  /* 버튼 크기 조정 */
   cursor: pointer; /* 클릭 가능하도록 커서 변경 */
+}
+
+/* 페이징 스타일 */
+.pagination {
+  display: flex;
+  position: absolute;
+  justify-content: center;
+  margin-top: 0px;
+  left: 800px;
+  /* bottom: 500px; */
+}
+
+.pagination button {
+  padding: 10px;
+  margin: 0 5px;
+  cursor: pointer;
+}
+
+.pagination span {
+  align-self: center;
+  margin: 0 10px;
 }
 
 </style>

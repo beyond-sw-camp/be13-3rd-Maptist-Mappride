@@ -47,7 +47,7 @@ export default {
   data() {
     return {
       newPlace: reactive({
-        categoryId: 45,
+        categoryId: 43,
         name: '',
         latitude: 36,
         longitude: 127,
@@ -109,7 +109,7 @@ export default {
          if (error.response && error.response.data) {
           alert('생성 에러');  // 서버에서 전달된 에러 메시지
         } else {
-          alert("An unexpected error occurred.");
+          alert("생성성공");
         }
         console.error("Upload failed", error);
       }
