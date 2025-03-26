@@ -40,9 +40,6 @@
         </li>
       </ul>
       <button class="btnSearch" @click="btnSearchClick">search</button>
-
-      <!-- <MainComponent :address="address.addressValue" :categories="categories.categoriesValue"/> -->
-
     </div>
 
     <div v-if="route.name === 'Categories' || route.name === 'Place'">
@@ -51,10 +48,6 @@
       <input v-model="searchQuery" class="txtSearch" type="text" placeholder="Search..." />
       <button class="btnSearch" @click="emitSearch">search</button>
     </div>
-
-    <!-- <div v-if="route.name !== 'Login'">
-      <button class="btnLogout">logout</button>
-    </div> -->
 
     <button class="logout" v-if="route.path !== '/api/v1'" @click="logout"> logout </button>
     
@@ -65,27 +58,25 @@
     </div>
   </div>
 
-  <!-- <RouterView :searchQuery="searchQuery" /> -->
   <RouterView></RouterView>
-
-
-  
 </template>
     
 <script setup>
   import { ref, reactive, onMounted } from 'vue';
   import { useRoute, useRouter  } from 'vue-router';
+  import { usePiniaStore } from '@/stores/pinia.js';
   import apiClient from '@/api/axios.js';
 
-  import MainComponent from '../MainComponent.vue';
   const router = useRouter();
   const route = useRoute();
   const selectedOption = ref('address');
   const txtSearchModel = ref('');
-  const txtButtonModel = ref('');
+  const txtMemberId = ref('');
   const filteredData = ref([]);
   const address = reactive({ addressValue: ''});
   const categories = reactive({ categoriesValue: ''});
+  const piniaStore = usePiniaStore();
+
   const searchQuery = ref('');
 
   const emitSearch = () => {
@@ -141,20 +132,14 @@
 
   const onItemSelect = async (item) => {
     txtSearchModel.value = item.name;
-    txtButtonModel.value = item.id;
+    txtMemberId.value = item.id;
     filteredData.value = [];
 
     try{
         if (selectedOption.value === 'user') {
-        if(!txtButtonModel.value) return;
+        if(!txtMemberId.value) return;
 
-        const response = await apiClient.get(`/categories/${txtButtonModel.value}`);
-
-        if (response.status === 200) {
-          categories.categoriesValue = response.data;
-        } else {
-          console.error('API 요청 실패:', response.status);
-        }
+        piniaStore.getCategory(txtMemberId.value);
       }
     } catch (error) {
       console.error('API 요청 실패:', error);
@@ -169,15 +154,9 @@
         address.addressValue = txtSearchModel.value;
       } 
       else if (selectedOption.value === 'user') {
-        if(!txtButtonModel.value) return;
+        if(!txtMemberId.value) return;
 
-        const response = await apiClient.get(`/categories/${txtButtonModel.value}`);
-
-        if (response.status === 200) {
-          categories.categoriesValue = response.data;
-        } else {
-          console.error('API 요청 실패:', response.status);
-        }
+        piniaStore.getCategory(txtMemberId.value);
       } 
       
       // else if (selectedOption.value === 'category') {  // 카테고리 검색 추가

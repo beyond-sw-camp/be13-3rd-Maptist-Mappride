@@ -13,7 +13,8 @@
 </template>
 
 <script setup>
-import { defineProps, onMounted, watch, ref } from 'vue';
+import { defineProps, onMounted, watch, ref, computed } from 'vue';
+import { usePiniaStore } from '@/stores/pinia.js';
 import apiClient from '@/api/axios.js';
 
 // 부모 컴포넌트로부터 전달된 주소를 받을 prop
@@ -21,10 +22,6 @@ const props = defineProps({
   address: {
     type: String,
     default: ''
-  },
-  categories: {
-    type: Array,  // categoryId, name
-    default: () => []
   }
 });
 
@@ -98,8 +95,13 @@ const searchAddressToCoordinate = (address, map) => {
 // 마커와 관련된 정보창을 저장할 배열
 let markers = [];
 
+// Pinia store에서 category 값을 가져옵니다
+const piniaStore = usePiniaStore();
+
+const categoryItems = computed(() => piniaStore.categories);
+
 // 카테고리가 바뀔 때마다 실행되는 watch
-watch(() => props.categories, (newCategories) => {
+watch(() => categoryItems.value, (newCategories) => {
   if (!map.value) return;
 
   // 기존 마커들과 정보창 삭제
@@ -178,22 +180,17 @@ const onCategoryButtonClick = async (category) => {
           title: place.name,
           icon: {
             url: "http://static.naver.com/maps2/icon/marker/marker_blue.png",  // 기본 마커 아이콘
-            size: new naver.maps.Size(40, 60),  // 아이콘 크기 (너비: 40px, 높이: 60px)
+            size: new naver.maps.Size(60, 80),  // 아이콘 크기 (너비: 40px, 높이: 60px)
             anchor: new naver.maps.Point(20, 60)  // 마커의 중심을 아이콘의 하단으로 맞추기
           }
         });
 
-
-        console.log(place);
-
-
-
         // 정보 창 내용 구성
         const contentString = [
-          '<div class="iw_inner">',
+        '<div class="iw_inner" style="width: 350px; height: 300px; padding: 5px; font-size: 20px;">',
           `   <h3>${place.name}</h3>`,
           `   <p>${place.address}<br />`,
-          `       <img src="${place.image || './img/example/hi-seoul.jpg'}" width="55" height="55" alt="${place.name}" class="thumb" /><br />`,
+          `       <img src="${place.photoUrl || './img/example/hi-seoul.jpg'}" width="280" height="100" alt="${place.name}" class="thumb" /><br />`,
           `       ${place.phone || ''}<br />`,
           `       <a href="${place.website || '#'}" target="_blank">${place.website || '웹사이트 없음'}</a>`,
           '   </p>',
@@ -215,7 +212,7 @@ const onCategoryButtonClick = async (category) => {
 
           const point = new naver.maps.LatLng(place.latitude, place.longitude);
             map.value.setCenter(point);  // 해당 위치로 지도 중심 이동
-            map.value.setZoom(15);
+            map.value.setZoom(16);
         });
 
         // 생성한 마커와 정보창을 markers 배열에 저장
@@ -243,7 +240,7 @@ const onCategoryButtonClick = async (category) => {
 .full {
   position: absolute;
   top: 95px;
-  /* left: 350px; */
+  left: 350px;
 }
 
 #map {
