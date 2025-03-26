@@ -24,6 +24,8 @@
     <div class="topLine"></div>
     <img @click="handleClick" class="btnNotice" src="/src/assets/images/public/image-150.png" />
 
+    <button v-if="route.name == 'Main'" class="myCategories" @click="showMyCategories">My Categories</button>
+
     <div v-if="route.name === 'Main'">
       <select v-model="selectedOption" class="btnDD">
           <option value="address">Address</option>
@@ -37,67 +39,68 @@
           {{ item.id + ' ' + item.name + ' ' + item.nickname }}
         </li>
       </ul>
-      <button class="btnSearch" @click="btnSearchClick">search</button>
-
-      <MainComponent :address="address.addressValue" :categories="categories.categoriesValue"/>
-
+      <button class="btnSearch" >search</button>
     </div>
 
     <div v-if="route.name === 'Categories' || route.name === 'Place'">
       <div class="lblName">name</div>
-
-      <input class="txtSearch" type="text" placeholder="Search..." />
-      <button class="btnSearch">search</button>
+      <input v-model="searchQuery" class="txtSearch" type="text" placeholder="Search..." />
+      <button class="btnSearch" @click="btnSearchClick">search</button>
     </div>
-
-    <!-- <div v-if="route.name !== 'Login'">
-      <button class="btnLogout">logout</button>
-    </div> -->
 
     <button class="logout" v-if="route.path !== '/api/v1'" @click="logout"> logout </button>
     
     <div v-if="route.name === 'Login'">
       <input class="txtSearch" type="text" placeholder="Search..." />
-      <button class="btnSearch">search</button>
+      <button class="btnSearch"@click="onsearch">search</button>
       <button class="btnLogin">login</button>
     </div>
   </div>
 
-  <!-- <RouterView></RouterView> -->
-
-
-  
+  <RouterView :searchQuery="searchQuery" />
+  <RouterView></RouterView>
 </template>
     
 <script setup>
   import { ref, reactive, onMounted } from 'vue';
-  import { useRoute, useRouter  } from 'vue-router';
+  import { useRoute, useRouter } from 'vue-router';
+  import { usePiniaStore } from '@/stores/pinia.js';
   import apiClient from '@/api/axios.js';
+  // import { useSearchStore } from '@/stores/pinia.js'; // Pinia store import
 
-  import MainComponent from '../MainComponent.vue';
+  // Pinia store에 연결된 searchQuery
+  // const store = useSearchStore();
+  // const searchQuery = ref(store.searchQuery);
+
   const router = useRouter();
   const route = useRoute();
   const selectedOption = ref('address');
   const txtSearchModel = ref('');
-  const txtButtonModel = ref('');
+  const txtMemberId = ref('');
   const filteredData = ref([]);
-  const address = reactive({ addressValue: ''});
-  const categories = reactive({ categoriesValue: ''});
+  const address = reactive({ addressValue: '' });
+  const categories = reactive({ categoriesValue: '' });
+  const piniaStore = usePiniaStore();
+
+  // 검색어 상태 설정
+  const emitSearch = () => {
+    store.setSearchQuery(searchQuery.value); // 검색어 상태 업데이트
+    console.log("검색 실행:", searchQuery.value);
+  };
 
   const logout = () => {
-   const isConfirmed = window.confirm("로그아웃 하시겠습니까?");
-   if (!isConfirmed) return; // 취소 시 아무 동작 안 함
- 
-   localStorage.removeItem('accessToken'); // 토큰 삭제
-   router.push({ name: 'Login' }); // 로그인 페이지로 이동
- };
+    const isConfirmed = window.confirm("로그아웃 하시겠습니까?");
+    if (!isConfirmed) return; // 취소 시 아무 동작 안 함
+
+    localStorage.removeItem('accessToken'); // 토큰 삭제
+    router.push({ name: 'Login' }); // 로그인 페이지로 이동
+  };
 
   const txtChanging = async (event) => {
     try {
       txtSearchModel.value = event.target.value;
 
-      if (selectedOption.value === 'user') {      
-
+      if (selectedOption.value === 'user') {
         const response = await apiClient.get(`/members/name?name=${txtSearchModel.value}`);
 
         if (response.status === 200) {
@@ -112,22 +115,16 @@
     }
   };
 
-  const onItemSelect = async (item) => {
-    txtSearchModel.value = item.name;
-    txtButtonModel.value = item.id;
-    filteredData.value = [];
+  const showMyCategories = async () => {
+    try {
+      const response = await apiClient.get('/categories');
 
-    try{
-        if (selectedOption.value === 'user') {
-        if(!txtButtonModel.value) return;
+      console.log(response.data);
 
-        const response = await apiClient.get(`/categories/${txtButtonModel.value}`);
-
-        if (response.status === 200) {
-          categories.categoriesValue = response.data;
-        } else {
-          console.error('API 요청 실패:', response.status);
-        }
+      if (response.status === 200) {
+        categories.categoriesValue = response.data;
+      } else {
+        console.error('API 요청 실패:', response.status);
       }
     } catch (error) {
       console.error('API 요청 실패:', error);
@@ -135,23 +132,44 @@
     }
   };
 
-  const btnSearchClick = async () => {    
-    try{
+  const onItemSelect = async (item) => {
+    txtSearchModel.value = item.name;
+    txtMemberId.value = item.id;
+    filteredData.value = [];
+
+    try {
+      if (selectedOption.value === 'user') {
+        if (!txtMemberId.value) return;
+
+        piniaStore.getCategory(txtMemberId.value);
+      }
+    } catch (error) {
+      console.error('API 요청 실패:', error);
+      alert('검색 실패. 다시 시도해주세요.');
+    }
+  };
+
+  const btnSearchClick = async () => {
+    try {
       if (selectedOption.value === 'address') {
         address.addressValue = txtSearchModel.value;
-        console.log('in Base',address.addressValue);
-      } 
-      else if (selectedOption.value === 'user') {
-        if(!txtButtonModel.value) return;
+      } else if (selectedOption.value === 'user') {
+        if (!txtMemberId.value) return;
 
-        const response = await apiClient.get(`/categories/${txtButtonModel.value}`);
-
-        if (response.status === 200) {
-          categories.categoriesValue = response.data;
-        } else {
-          console.error('API 요청 실패:', response.status);
-        }
+        piniaStore.getCategory(txtMemberId.value);
       }
+      // 카테고리 검색 추가
+      // else if (selectedOption.value === 'category') {  
+      //   if (!txtSearchModel.value) return;
+
+      //   const response = await apiClient.get(`/categories/search?query=${txtSearchModel.value}`);
+
+      //   if (response.status === 200) {
+      //     categories.categoriesValue = response.data;
+      //   } else {
+      //     console.error('카테고리 검색 API 요청 실패:', response.status);
+      //   }
+      // }
     } catch (error) {
       console.error('API 요청 실패:', error);
       alert('검색 실패. 다시 시도해주세요.');
@@ -425,6 +443,18 @@
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+  .myCategories {
+    width: 120px;
+    height: 60px;
+    font-size: 20px;
+    font-weight: 400;
+    position: absolute;
+    left: 20px;
+    top: 25px;
+  }
+  .myCategories:hover {
+    background-color: #d2d2d2;
   }
 
 </style>
