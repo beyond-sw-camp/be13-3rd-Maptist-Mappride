@@ -64,6 +64,9 @@
   </div>
 
   <RouterView></RouterView>
+
+
+  
 </template>
     
 <script setup>
@@ -91,8 +94,9 @@
 
   const txtChanging = async (event) => {
     try {
-      if (selectedOption.value === 'user') {
-        txtSearchModel.value = event.target.value;
+      txtSearchModel.value = event.target.value;
+
+      if (selectedOption.value === 'user') {      
 
         const response = await apiClient.get(`/members/name?name=${txtSearchModel.value}`);
 
@@ -108,19 +112,37 @@
     }
   };
 
-  const onItemSelect = (item) => {
+  const onItemSelect = async (item) => {
     txtSearchModel.value = item.name;
     txtButtonModel.value = item.id;
     filteredData.value = [];
+
+    try{
+        if (selectedOption.value === 'user') {
+        if(!txtButtonModel.value) return;
+
+        const response = await apiClient.get(`/categories/${txtButtonModel.value}`);
+
+        if (response.status === 200) {
+          categories.categoriesValue = response.data;
+        } else {
+          console.error('API 요청 실패:', response.status);
+        }
+      }
+    } catch (error) {
+      console.error('API 요청 실패:', error);
+      alert('검색 실패. 다시 시도해주세요.');
+    }
   };
 
   const btnSearchClick = async () => {    
     try{
       if (selectedOption.value === 'address') {
         address.addressValue = txtSearchModel.value;
-      } else if (selectedOption.value === 'user') {
+      } 
+      else if (selectedOption.value === 'user') {
         if(!txtButtonModel.value) return;
-        
+
         const response = await apiClient.get(`/categories/${txtButtonModel.value}`);
 
         if (response.status === 200) {
@@ -338,7 +360,7 @@
     position: absolute;
     background-color: white;
     width: 100%;
-    z-index: 1000;
+    z-index: 2;
     width: 450px;
   }
 
