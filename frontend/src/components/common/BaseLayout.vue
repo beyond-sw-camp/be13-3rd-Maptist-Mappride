@@ -24,6 +24,8 @@
     <div class="topLine"></div>
     <img @click="handleClick" class="btnNotice" src="/src/assets/images/public/image-150.png" />
 
+    <button v-if="route.name == 'Main'" class="myCategories" @click="showMyCategories">My Categories</button>
+
     <div v-if="route.name === 'Main'">
       <select v-model="selectedOption" class="btnDD">
           <option value="address">Address</option>
@@ -112,6 +114,24 @@
     }
   };
 
+  const showMyCategories = async () => {
+    try{
+    const response = await apiClient.get('/categories');
+
+      console.log(response.data);
+      
+        if (response.status === 200) {
+          categories.categoriesValue = response.data;
+        } else {
+          console.error('API 요청 실패:', response.status);
+        }
+      }
+    catch (error) {
+      console.error('API 요청 실패:', error);
+      alert('검색 실패. 다시 시도해주세요.');
+    }
+  }
+
   const onItemSelect = async (item) => {
     txtSearchModel.value = item.name;
     txtButtonModel.value = item.id;
@@ -134,6 +154,7 @@
       alert('검색 실패. 다시 시도해주세요.');
     }
   };
+
 
   const btnSearchClick = async () => {    
     try{
@@ -424,6 +445,18 @@
     display: flex;
     align-items: center;
     justify-content: center;
+  }
+  .myCategories {
+    width: 120px;
+    height: 60px;
+    font-size: 20px;
+    font-weight: 400;
+    position: absolute;
+    left: 20px;
+    top: 25px;
+  }
+  .myCategories:hover {
+    background-color: #d2d2d2;
   }
 
 </style>
