@@ -1,4 +1,6 @@
 # MAPPRIDE - by MAPTIST
+
+<br>
 <br>
 
 ![mapbusim_logo_resized](https://github.com/user-attachments/assets/0d400c83-0645-4262-a42f-95163a2db7bb)
