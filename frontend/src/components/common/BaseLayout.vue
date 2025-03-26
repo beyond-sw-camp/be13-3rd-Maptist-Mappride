@@ -24,8 +24,6 @@
     <div class="topLine"></div>
     <img @click="handleClick" class="btnNotice" src="/src/assets/images/public/image-150.png" />
 
-    <button v-if="route.name == 'Main'" class="myCategories" @click="showMyCategories">My Categories</button>
-
     <div v-if="route.name === 'Main'">
       <select v-model="selectedOption" class="btnDD">
           <option value="address">Address</option>
@@ -40,14 +38,21 @@
         </li>
       </ul>
       <button class="btnSearch" @click="btnSearchClick">search</button>
+
+      <MainComponent :address="address.addressValue" :categories="categories.categoriesValue"/>
+
     </div>
 
     <div v-if="route.name === 'Categories' || route.name === 'Place'">
       <div class="lblName">name</div>
 
-      <input v-model="searchQuery" class="txtSearch" type="text" placeholder="Search..." />
-      <button class="btnSearch" @click="emitSearch">search</button>
+      <input class="txtSearch" type="text" placeholder="Search..." />
+      <button class="btnSearch">search</button>
     </div>
+
+    <!-- <div v-if="route.name !== 'Login'">
+      <button class="btnLogout">logout</button>
+    </div> -->
 
     <button class="logout" v-if="route.path !== '/api/v1'" @click="logout"> logout </button>
     
@@ -58,31 +63,26 @@
     </div>
   </div>
 
-  <RouterView></RouterView>
+  <!-- <RouterView></RouterView> -->
+
+
+  
 </template>
     
 <script setup>
   import { ref, reactive, onMounted } from 'vue';
   import { useRoute, useRouter  } from 'vue-router';
-  import { usePiniaStore } from '@/stores/pinia.js';
   import apiClient from '@/api/axios.js';
 
+  import MainComponent from '../MainComponent.vue';
   const router = useRouter();
   const route = useRoute();
   const selectedOption = ref('address');
   const txtSearchModel = ref('');
-  const txtMemberId = ref('');
+  const txtButtonModel = ref('');
   const filteredData = ref([]);
   const address = reactive({ addressValue: ''});
   const categories = reactive({ categoriesValue: ''});
-  const piniaStore = usePiniaStore();
-
-  const searchQuery = ref('');
-
-  const emitSearch = () => {
-    // Search function when button is clicked
-    console.log("검색 실행:", searchQuery.value);
-  };
 
   const logout = () => {
    const isConfirmed = window.confirm("로그아웃 하시겠습니까?");
@@ -112,34 +112,22 @@
     }
   };
 
-  const showMyCategories = async () => {
-    try{
-    const response = await apiClient.get('/categories');
+  const onItemSelect = async (item) => {
+    txtSearchModel.value = item.name;
+    txtButtonModel.value = item.id;
+    filteredData.value = [];
 
-      console.log(response.data);
-      
+    try{
+        if (selectedOption.value === 'user') {
+        if(!txtButtonModel.value) return;
+
+        const response = await apiClient.get(`/categories/${txtButtonModel.value}`);
+
         if (response.status === 200) {
           categories.categoriesValue = response.data;
         } else {
           console.error('API 요청 실패:', response.status);
         }
-      }
-    catch (error) {
-      console.error('API 요청 실패:', error);
-      alert('검색 실패. 다시 시도해주세요.');
-    }
-  }
-
-  const onItemSelect = async (item) => {
-    txtSearchModel.value = item.name;
-    txtMemberId.value = item.id;
-    filteredData.value = [];
-
-    try{
-        if (selectedOption.value === 'user') {
-        if(!txtMemberId.value) return;
-
-        piniaStore.getCategory(txtMemberId.value);
       }
     } catch (error) {
       console.error('API 요청 실패:', error);
@@ -147,30 +135,23 @@
     }
   };
 
-
   const btnSearchClick = async () => {    
     try{
       if (selectedOption.value === 'address') {
         address.addressValue = txtSearchModel.value;
+        console.log('in Base',address.addressValue);
       } 
       else if (selectedOption.value === 'user') {
-        if(!txtMemberId.value) return;
+        if(!txtButtonModel.value) return;
 
-        piniaStore.getCategory(txtMemberId.value);
-      } 
-      
-      // else if (selectedOption.value === 'category') {  // 카테고리 검색 추가
-      //   if (!txtSearchModel.value) return;
-        
-      //   const response = await apiClient.get(`/categories/search?query=${txtSearchModel.value}`);
+        const response = await apiClient.get(`/categories/${txtButtonModel.value}`);
 
-      //   if (response.status === 200) {
-      //     categories.categoriesValue = response.data;
-      //   } else {
-      //     console.error('카테고리 검색 API 요청 실패:', response.status);
-      //   }
-      // }
-
+        if (response.status === 200) {
+          categories.categoriesValue = response.data;
+        } else {
+          console.error('API 요청 실패:', response.status);
+        }
+      }
     } catch (error) {
       console.error('API 요청 실패:', error);
       alert('검색 실패. 다시 시도해주세요.');
@@ -444,18 +425,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-  }
-  .myCategories {
-    width: 120px;
-    height: 60px;
-    font-size: 20px;
-    font-weight: 400;
-    position: absolute;
-    left: 20px;
-    top: 25px;
-  }
-  .myCategories:hover {
-    background-color: #d2d2d2;
   }
 
 </style>
