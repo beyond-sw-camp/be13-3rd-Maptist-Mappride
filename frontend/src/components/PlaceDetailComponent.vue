@@ -41,9 +41,7 @@
     </div> -->
     <div :class="place.color" class="place-color" v-if="!isEditing"></div>
 
-    <div :class="place.color" class="place-color" v-if="isEditing">
-      <!-- 색상 선택 드롭다운 -->
-      <div class="dropdown-container" @click="toggleDropdown">
+    <div class="dropdown-container" @click="toggleEditMode()" v-if="isEditing">
       <div class="selected-option">
         <div class="color-circle" :class="selectedClass"></div>
       </div>
@@ -52,7 +50,6 @@
           <div class="color-circle" :class="color.className"></div>
         </li>
       </ul>
-    </div>
     </div>
         
     
@@ -132,7 +129,7 @@
 
     <!-- 뉴 comments -->
     <!-- <ul style="list-style-type: none; margin: 0; padding: 0;">  일반적으로 -->
-    <div class="rectangle-51">
+      <div class="rectangle-51">
     <ul style="list-style-type: none;">
       <li v-for="(comment, index) in comments" :key="index" class="comment-item">
         <div class="comment-memberName">{{ comment.memberName }}</div>
@@ -150,11 +147,14 @@
               <img src="/src/assets/images/public/image-290.png" />
             </button>
             <!-- 삭제 버튼 -->
-            <button @click.stop="cconfirmDelete(index)" class="transparent-button">
+            <button @click.stop="deleteComment(index)" class="transparent-button">
               <img src="/src/assets/images/public/image-230.png" />
             </button>
           </div>
         </div>
+      </li>
+    </ul>
+  </div>
 
         <!-- old 댓글 작성자와 로그인된 사용자 ID 비교 -->
         <!-- <div v-if="member.id === comment.memberId" class="comment-actions">
@@ -168,10 +168,7 @@
           </button>
         </div> -->
 
-        
-      </li>
-    </ul>
-    </div>
+    
 
     <!-- 구 댓글 수정 버튼 -->
     <!-- <img class="image-49" src="/src/assets/images/public/image-290.png" /> -->
@@ -192,7 +189,7 @@
     <!-- 댓글 입력창 -->
     <!-- <div class="rectangle-5"></div> -->
     <div class="rectangle-5">
-      <textarea class="textarea-rectangle-5" placeholder="내용을 입력하세요"></textarea>
+      <textarea class="textarea-rectangle-5" placeholder="내용을 입력하세요" v-model="newComment.comment"></textarea>
     </div>
     
     <!-- 구 댓글창 -->
@@ -234,7 +231,7 @@
 
     <!-- 댓글 작성 완료 버튼 -->
     <!-- <div class="write">Write</div> -->
-    <button @click="writeClick">
+    <button @click="writeClick()">
     <div class="write">Write</div>
     </button>
 
@@ -273,12 +270,32 @@ const selectedFiles = ref([]);
 const previewSrc = ref([]);
 const src = ref([]);
 const photos = ref([]);
+const newComment = ref({
+  comment: ''
+});
 const modifyPlace = ref({
   name: '',
   color: '',
   content: '',
   placeId: '', // 실제로 placeId는 서버에서 받아온 값
-})
+});
+const isOpen = ref(false); // 드롭다운 열림 여부
+const selectedClass = ref(''); // 기본 선택된 색상
+const colors = ref([
+  { className: "ellipse-2" },
+  { className: "ellipse-3" },
+  { className: "ellipse-4" },
+  { className: "ellipse-5" },
+  { className: "ellipse-6" }
+]);
+const toggleEditMode = () => {
+  isOpen.value = !isOpen.value;
+};
+const selectColor = (colorClass) => {
+      selectedClass.value = colorClass;
+      place.value.color = colorClass;
+      isOpen.value = false; // 선택 후 드롭다운 닫기
+    };
 
 onMounted(async () => {
   placeId.value = String(route.params.placeId);
@@ -292,6 +309,10 @@ onMounted(async () => {
     ]);
 
     comments.value = commentsRes.data;
+    console.log(comments.value);
+    
+
+
     place.value = placeRes.data;
     console.log(place.value);
     
@@ -337,16 +358,31 @@ const deletePhoto = async(index) => {
   
 }
 
-const editComment = (index) => {
+const editComment = async(index) => {
   const newComment = prompt("댓글을 수정하세요:", comments.value[index].comment);
   if (newComment) {
     comments.value[index].comment = newComment;
+
+    const CommentUpdateDto = {
+      id : comments.value[index].commentId,
+      comment : comments.value[index].comment,
+    }
+
+    console.log(CommentUpdateDto);
+    
+
+    await apiClient.put('/comments/update', CommentUpdateDto);
+
   }
 };
 
-const deleteComment = (index) => {
+const deleteComment = async (index) => {
   if (confirm('댓글을 삭제하시겠습니까?')) {
-    comments.value.splice(index, 1);
+  
+    await apiClient.delete(`/comments/${comments.value[index].commentId}`)
+    .then(alert('삭제 완료'))
+
+    comments.value.splice(index,1);
   }
 };
 
@@ -390,8 +426,25 @@ const onColorChange = () => {
   console.log("선택된 색상:", selectedColor.value);
 };
 
-const writeClick = () => {
+const writeClick = async() => {
   console.log("write 버튼 클릭됨!");
+
+  const CommentCreateDto = { 
+    comment : newComment.value.comment,
+    placeId : place.value.id,
+  }
+
+  console.log(CommentCreateDto);
+  
+
+  const response = await apiClient.post('/comments',CommentCreateDto);
+
+  console.log(response);
+
+  comments.value.push(response.data);
+  
+
+
 };
 
 const handleFileChange = (event) => {
@@ -473,6 +526,20 @@ const dataURItoBlob = (dataURI) => {
 </script>
 
 <style scoped>
+.dropdown-container-color.open .dropdown-menu-color {
+  display: block;
+}
+
+.dropdown-image{
+  display: inline;
+  margin-left:auto;
+  width: 30px;
+  height: 30px;
+}
+
+.color-circle:hover {
+  transform: scale(1.1);
+}
 .div,
 .div * {
   box-sizing: border-box;
@@ -482,6 +549,66 @@ const dataURItoBlob = (dataURI) => {
   height: 1080px;
   position: relative;
   overflow: hidden;
+}
+
+/* 드롭다운 컨테이너 */
+.dropdown-container {
+  width: 50px;
+  height: 50px;
+  border: 1px solid #d9d9d9;
+  border-radius: 50%;
+  position: absolute;
+  left: 1200px;
+  top: 170px;
+  background: #ffffff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* 선택된 색상 표시 */
+.selected-option {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* 드롭다운 메뉴 */
+.dropdown-menu {
+  position: absolute;
+  top: 60px;
+  left: 0;
+  background: white;
+  border: 1px solid #d9d9d9;
+  border-radius: 5px;
+  padding: 5px 0;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  z-index: 10;
+}
+
+/* 드롭다운 항목 */
+.dropdown-menu li {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 5px 0;
+  cursor: pointer;
+}
+
+.dropdown-menu li:hover {
+  background: #f0f0f0;
+}
+
+/* 색상 원 */
+.color-circle {
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
 }
 
 .comment-actions {
@@ -779,14 +906,6 @@ padding: 5px;
   position: absolute;
   left: 1366px;
   top: 97px;
-}
-.ellipse-2 {
-  width: 31px;
-  height: 31px;
-  position: absolute;
-  left: 1166px;
-  top: 171px;
-  overflow: visible;
 }
 .image-33 {
   width: 40px;

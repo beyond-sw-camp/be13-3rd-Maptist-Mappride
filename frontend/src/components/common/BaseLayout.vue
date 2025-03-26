@@ -24,7 +24,7 @@
     <div class="topLine"></div>
     <img @click="handleClick" class="btnNotice" src="/src/assets/images/public/image-150.png" />
 
-    <button v-if="route.name == 'Main'" class="myCategories" @click="showMyCategories">My Categories</button>
+    <button v-if="route.name == 'Main'" class="myCategories" @click="showMyCategories()">My Categories</button>
 
     <div v-if="route.name === 'Main'">
       <select v-model="selectedOption" class="btnDD">
@@ -116,20 +116,7 @@
   };
 
   const showMyCategories = async () => {
-    try {
-      const response = await apiClient.get('/categories');
-
-      console.log(response.data);
-
-      if (response.status === 200) {
-        categories.categoriesValue = response.data;
-      } else {
-        console.error('API 요청 실패:', response.status);
-      }
-    } catch (error) {
-      console.error('API 요청 실패:', error);
-      alert('검색 실패. 다시 시도해주세요.');
-    }
+    piniaStore.getMyCategories()
   };
 
   const onItemSelect = async (item) => {
@@ -140,7 +127,7 @@
     try {
       if (selectedOption.value === 'user') {
         if (!txtMemberId.value) return;
-
+        
         piniaStore.getCategory(txtMemberId.value);
       }
     } catch (error) {
@@ -175,6 +162,9 @@
       alert('검색 실패. 다시 시도해주세요.');
     }
   };
+
+
+
 </script>
     
 <style scoped>
