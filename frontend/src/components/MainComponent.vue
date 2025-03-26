@@ -13,23 +13,30 @@
 </template>
 
 <script setup>
-import { defineProps, onMounted, watch, ref } from 'vue';
+import { defineProps, onMounted, watch, ref, computed } from 'vue';
+import { usePiniaStore } from '@/stores/pinia.js';
 import apiClient from '@/api/axios.js';
+
+// Pinia store에서 category 값을 가져옵니다
+const piniaStore = usePiniaStore();
 
 // 부모 컴포넌트로부터 전달된 주소를 받을 prop
 const props = defineProps({
   address: {
     type: String,
     default: ''
-  },
-  categories: {
-    type: Array,  // categoryId, name
-    default: () => []
   }
 });
 
 // map 객체를 ref로 정의
 const map = ref(null);
+
+// categoryId 들고 있을 데이터
+let categoriesId = '';
+
+// 지도에서 빈 지도에서 클릭시 저장할 배열
+let markerMap = [];
+
 // 네이버 지도 API 로드 및 지도 생성
 onMounted(() => {
   const script = document.createElement("script");
@@ -39,22 +46,42 @@ onMounted(() => {
   document.head.appendChild(script);
 
   script.onload = () => {
-    // 네이버 지도 생성
-    map.value = new window.naver.maps.Map("map", {
-      center: new window.naver.maps.LatLng(37.5112, 127), // 한강 중심으로 하는 지도
-      zoom: 13
+      // 네이버 지도 생성
+      map.value = new window.naver.maps.Map("map", {
+        center: new window.naver.maps.LatLng(37.5112, 127), // 한강 중심으로 하는 지도
+        zoom: 13
+      });
+
+      // 클릭이벤트를 적용하여 경고창으로 위도 경도를 봅니다.
+      naver.maps.Event.addListener(map.value, 'click', function(e){
+        // 기존 마커들과 정보창 삭제
+        markerMap.forEach(markerData => {
+          markerData.setMap(null);  // 마커 삭제
+        });
+        markerMap = [];
+
+        const marker = new naver.maps.Marker({
+          position: e.coord,
+          map: map.value,
+          icon: {
+            url: "http://static.naver.com/maps2/icon/marker/marker_blue.png",  // 기본 마커 아이콘
+            size: new naver.maps.Size(60, 80),  // 아이콘 크기 (너비: 40px, 높이: 60px)
+            anchor: new naver.maps.Point(20, 60)  // 마커의 중심을 아이콘의 하단으로 맞추기
+          }
+        });
+
+        markerMap.push(marker);
+
+        if (categoriesId)
+        {
+          piniaStore.getLatitude(e.coord.lat());
+          piniaStore.getLongitude(e.coord.lng());
+          piniaStore.getCategoryId(categoriesId);
+        }
     });
-  };
-  console.log("지도가 초기화되었습니다.", map.value)
+  }
 });
 
-// watch로 address 값 변경을 감지하여 실시간으로 지도에 반영
-watch(() => props.address, (newAddress) => {
-    if (newAddress && map.value) {
-      console.log('in main', newAddress);
-      searchAddressToCoordinate(newAddress, map.value);
-    }
-});
 // 최유진 필독!!!! 
 // watch -> searchAddressToCoordinate 
 // -> 서버에서 getMapping으로 좌표 가져옴
@@ -90,18 +117,11 @@ const searchAddressToCoordinate = async(address, map) => {
 // 마커와 관련된 정보창을 저장할 배열
 let markers = [];
 
-// 카테고리가 바뀔 때마다 실행되는 watch
-watch(() => props.categories, (newCategories) => {
-  if (!map.value) return;
+const categoryItems = computed(() => piniaStore.categories);
 
-  // 기존 마커들과 정보창 삭제
-  markers.forEach(markerData => {
-    markerData.marker.setMap(null);  // 마커 삭제
-    if (markerData.infowindow.getMap()) {
-      markerData.infowindow.close();  // 열린 정보창 닫기
-    }
-  });
-  markers = [];  // 배열 초기화
+// 카테고리가 바뀔 때마다 실행되는 watch
+watch(() => categoryItems.value, (newCategories) => {
+  if (!map.value) return;
 
   // 버튼을 다시 생성하여 위치를 조정
   createCategoryButtons(newCategories);
@@ -170,24 +190,20 @@ const onCategoryButtonClick = async (category) => {
           title: place.name,
           icon: {
             url: "http://static.naver.com/maps2/icon/marker/marker_blue.png",  // 기본 마커 아이콘
-            size: new naver.maps.Size(40, 60),  // 아이콘 크기 (너비: 40px, 높이: 60px)
+            size: new naver.maps.Size(60, 80),  // 아이콘 크기 (너비: 40px, 높이: 60px)
             anchor: new naver.maps.Point(20, 60)  // 마커의 중심을 아이콘의 하단으로 맞추기
           }
         });
 
 
-        console.log(place);
-
-
-
         // 정보 창 내용 구성
         const contentString = [
-          '<div class="iw_inner">',
+        '<div class="iw_inner" style="width: 350px; height: 300px; padding: 5px; font-size: 20px;">',
           `   <h3>${place.name}</h3>`,
           `   <p>${place.address}<br />`,
-          `       <img src="${place.image || './img/example/hi-seoul.jpg'}" width="55" height="55" alt="${place.name}" class="thumb" /><br />`,
+          `       <img src="${place.photoUrl || './img/example/hi-seoul.jpg'}" width="280" height="100" alt="${place.name}" class="thumb" /><br />`,
           `       ${place.phone || ''}<br />`,
-          `       <a href="${place.website || '#'}" target="_blank">${place.website || '웹사이트 없음'}</a>`,
+          `       <a href="${`/api/v1/place/${place.placeId}` || '#'}">${place.name || '웹사이트 없음'}</a>`,
           '   </p>',
           '</div>'
         ].join('');
@@ -207,7 +223,7 @@ const onCategoryButtonClick = async (category) => {
 
           const point = new naver.maps.LatLng(place.latitude, place.longitude);
             map.value.setCenter(point);  // 해당 위치로 지도 중심 이동
-            map.value.setZoom(15);
+            map.value.setZoom(16);
         });
 
         // 생성한 마커와 정보창을 markers 배열에 저장

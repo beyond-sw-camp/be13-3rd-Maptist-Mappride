@@ -57,7 +57,7 @@
     </div>
   </div>
 
-  <RouterView :searchQuery="searchQuery" />
+  <!-- <RouterView :searchQuery="searchQuery" /> -->
   <RouterView></RouterView>
 </template>
     
