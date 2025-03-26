@@ -10,26 +10,22 @@
     <div class="color-dividing-line"></div>
 
     <ul class="place-list">
-      <li v-for="(place, index) in places" :key="index" class="place-item">
+      <li v-for="(place, index) in paginatedPlaces" :key="index" class="place-item">
         <router-link :to="`/api/v1/place/${place.placeId}`" class="place-link">
             {{ place.name }} 
           </router-link>
-        <div class="place-address">{{ place.placeAddress }}</div>
-
-        <!-- 색상 드롭다운 -->
-        <div class="dropdown-container-color" :class="{ open: colorDropdownVisible[index] }">
-          <div class="selected-option" @click="toggleColorDropdown(index)">
-            <div class="color-circle" :class="selectedClass[index]"></div>
-          </div>
-
-          <ul v-show="colorDropdownVisible[index]" class="dropdown-menu-color">
-            <li v-for="(color, colorIndex) in colors" :key="colorIndex" @click="selectColor(index, color.className)">
-              <div class="color-circle" :class="color.className"></div>
-            </li>
-          </ul>
-        </div>
+        <div :class="place.address" class="place-address">{{ place.address }}</div>
+        <div :class="place.color" class="place-color"></div>
       </li>
     </ul>
+
+    <!-- 페이지네이션 버튼 -->
+    <div class="pagination">
+      <button @click="prevPage" :disabled="currentPage === 1">Previous</button>
+      <span>Page {{ currentPage }} of {{ totalPages }}</span>
+      <button @click="nextPage" :disabled="currentPage === totalPages">Next</button>
+    </div>
+
 
     <!-- 정렬 드롭다운 -->
     <div class="sortDropdown" @click="toggleSortDropdown">
@@ -49,7 +45,7 @@
   </div>
 </template>
   <script>
-  import { ref, onMounted } from "vue";
+  import { ref, onMounted,computed } from "vue";
   import apiClient from "@/api/axios.js";
   import { useRoute } from "vue-router";
   
@@ -58,53 +54,102 @@
     setup() {
       const route = useRoute();
       const places = ref([]);
-      const colorDropdownVisible = ref([]);
-      const selectedClass = ref([]);
+      // const colorDropdownVisible = ref([]);
+      // const selectedClass = ref([]);
       const categoryId = ref(route.params.categoryId);
-      const apiUrl = `/categories/${categoryId}/places`;
+
+      // 페이지네이션 관련 변수
+      const currentPage = ref(1);  // 현재 페이지
+      const itemsPerPage = 10;      // 한 페이지당 항목 수
+      const totalPages = ref(1);   // 총 페이지 수
+
+      // 페이지네이션에 맞는 데이터만 표시하도록 처리
+      const paginatedPlaces = computed(() => {
+        const startIndex = (currentPage.value - 1) * itemsPerPage;
+        const endIndex = startIndex + itemsPerPage;
+        return places.value.slice(startIndex, endIndex);
+      });
+
+      
 
       // 페이지가 마운트되면 장소 데이터를 받아옴
       onMounted(async () => {
-  try {
-    const categoryId = String(route.params.categoryId); // 문자열 변환
-    console.log("📌 변환된 categoryId:", categoryId, typeof categoryId);
+        try {
+          const categoryId = String(route.params.categoryId); // 문자열 변환
+          console.log("📌 변환된 categoryId:", categoryId, typeof categoryId);
 
-    const url = `/categories/${categoryId}/places`; // baseURL 적용됨
-    console.log("🚀 요청 URL:", url);
+          const url = `/categories/${categoryId}/places`; // baseURL 적용됨
+          console.log("🚀 요청 URL:", url);
 
-    const response = await apiClient.get(url); // 비동기 요청
-    console.log("✅ 서버 응답 데이터:", response.data);
+          const response = await apiClient.get(url); // 비동기 요청
+          console.log("✅ 서버 응답 데이터:", response.data);
 
-    places.value = response.data;
-    console.log(places);
-    
-    initializeCategoryOptions(); // 데이터 로딩 후 초기화
 
-  } catch (error) {
-    console.error("❌ 에러 발생:", error);
-  }
-});
+          // 데이터가 배열인지 확인 후 할당
+          if (Array.isArray(response.data)) {
+            places.value = response.data.map((place, index) => {
+              const createdAtDate = place.reg_date ? new Date(place.reg_date) : new Date();
+              console.log(`🕒 장소 ${index} - reg_date:`, place.reg_date, "➡️ 변환된 createdAt:", createdAtDate);
+              return { ...place, createdAt: createdAtDate }; // reg_date를 기반으로 createdAt 설정
+            });
+
+            // 총 페이지 수 계산
+            totalPages.value = Math.ceil(places.value.length / itemsPerPage);
+          } else {
+            console.error("❌ 응답 데이터가 배열이 아닙니다:", response.data);
+          }
+
+          initializeCategoryOptions(); // 데이터 로딩 후 초기화
+
+        } catch (error) {
+          console.error("❌ 에러 발생:", error);
+        }
+      });
+
+      // 페이지 이동 함수
+      const nextPage = () => {
+        if (currentPage.value < totalPages.value) {
+          currentPage.value++;
+        }
+      };
+
+      const prevPage = () => {
+        if (currentPage.value > 1) {
+          currentPage.value--;
+        }
+      };
 
       const initializeCategoryOptions = () => {
         // places.value가 배열인지 확인 후에만 forEach 실행
         if (Array.isArray(places.value)) {
           places.value.forEach((place) => {
+            console.log("🎯 각 place 객체:", place);
             place.isModify = false;
+             // 색상 값 추가 예시 (API에서 받아오는 색상값을 해당 필드에 저장)
+             console.log("🎨 색상 값:", place.color);
+             console.log("🏠 주소 값:", place.address);  // 주소 출력
+            //  place.colorClass = getColorClassForPlace(place); // 색상 클래스 설정
           });
         }
       };
 
 
-      
-      // const colorDropdownVisible = ref(new Array(places.value.length).fill(false));
-      // const selectedClass = ref(new Array(places.value.length).fill("ellipse-2"));
-      const colors = ref([
-        { className: "ellipse-2" },
-        { className: "ellipse-3" },
-        { className: "ellipse-4" },
-        { className: "ellipse-5" },
-        { className: "ellipse-6" }
-      ]);
+      const getColorClassForPlace = (place) => {
+        console.log("🔍 색상 클래스 결정:", place.color);
+      // 예시: place.color 값에 따라 적절한 색상 클래스를 반환하는 함수
+      switch (place.color) {
+        case "pink":
+          return "ellipse-2";
+        case "mint":
+          return "ellipse-3";
+        case "blue":
+          return "ellipse-4";
+        case "orange":
+          return "ellipse-5";
+        default:
+          return "ellipse-6";
+      }
+    };
   
       const sortDropdownVisible = ref(false);
       const selectedSortImage = ref("/src/assets/images/MyPlaceComponent/filter.png");
@@ -126,127 +171,69 @@
           console.error("데이터를 가져오는 데 실패했습니다:", error);
         }
       };
-  
-      
-      
-  
-      // 수정 및 삭제 기능
-      const modifyPlace = (index) => {
-      // 장소 수정 전 상태 백업
-        if (!places.value[index].originalPlaces || places.value[index].isModify === false) {
-          places.value[index].originalPlaces = { ...places.value[index] }; // 수정 전 상태 백업
-        }
 
-        places.value[index].isModify = !places.value[index].isModify;  // 수정 모드 토글
-      };
-
-// 수정 취소 버튼 클릭 시 원래 상태로 복원  
-    const resetPlace = (index) => {
-       // 수정 전 상태로 복원
-      const originalPlaces = places.value[index].originalPlaces;
-      if (originalPlaces) {
-        places.value[index].name = originalPlaces.name;
-        places.value[index].publish = originalPlaces.publish;
-        places.value[index].isModify = false; // 수정 모드 해제
-      } else {
-        console.error('원래 장소 정보가 존재하지 않습니다.');
-      }
-    };
-
-    const updateSubmit = async(placeName, index) => {
-      // 중복된 이름 확인
-      const isDuplicate = places.value.some((place, idx) => place.name === placeName && idx !== index);
-
-    if (isDuplicate) {
-      alert('이미 존재하는 장소 이름입니다.');
-      places.value[index].name = places.value[index].originalPlaces.name;
-      places.value[index].isModify = false;
-      return;
-    }
-
-    const payload = {
-      id: places.value[index].id,
-      name: placeName,
-    };
-
-    try {
-      const response = await apiClient.put(`/place`, payload);
-      places.value[index].name = placeName;
-    } catch (error) {
-      console.error('장소 수정 실패:', error);
-    }
-
-    places.value[index].isModify = false;
-    }
-
-
-// 장소 삭제
-const deletePlace = async (index) => {
-  const placeId = places.value[index].id;  // 삭제할 장소의 id를 사용
-
-    const isConfirmed = confirm("진짜 지움?");
-    if (isConfirmed) {
-      try {
-        await apiClient.delete(`/api/v1/place/${placeId}`); // `placeId`로 삭제 요청
-        console.log(`🗑 삭제된 장소: ${places.value[index].name}`);
-        
-        places.value.splice(index, 1); // UI에서 해당 장소 삭제
-      } catch (error) {
-        console.error("❌ 장소 삭제 중 오류 발생:", error);
-      }
-    } else {
-      console.log("삭제 취소");
-    }
-  };
-  
-      // 색상 드롭다운 관련 함수
-      const toggleColorDropdown = (index) => {
-        colorDropdownVisible.value[index] = !colorDropdownVisible.value[index];
-        colorDropdownVisible.value = colorDropdownVisible.value.map((_, i) => (i === index ? colorDropdownVisible.value[index] : false));
-      };
-  
-      const selectColor = (index, colorClass) => {
-        selectedClass.value[index] = colorClass;
-        colorDropdownVisible.value[index] = false;
-      };
   
       // 정렬 드롭다운 관련 함수
       const toggleSortDropdown = () => {
         sortDropdownVisible.value = !sortDropdownVisible.value;
       };
   
+
+      const sortBy = (criteria) => {
+        if (criteria === "date-asc") {
+          places.value.sort((a, b) => new Date(a.reg_date) - new Date(b.reg_date));
+        } else if (criteria === "date-desc") {
+          places.value.sort((a, b) => new Date(b.reg_date) - new Date(a.reg_date));
+        } else if (criteria === "name-asc") {
+          places.value.sort((a, b) => a.name.localeCompare(b.name));
+        } else if (criteria === "name-desc") {
+          places.value.sort((a, b) => b.name.localeCompare(a.name));
+        }
+        console.log("✅ 정렬 완료:", places.value);
+      };
+
+
       const setSortOrder = (option) => {
         selectedSort.value = option.label;
         selectedSortImage.value = option.image;
-        console.log(`정렬 기준: ${option.value}`);
+        
+        sortBy(option.value);  // 정렬 함수 실행
       };
+
+      
+
+
+
+
   
       return {
-        colorDropdownVisible,
-        selectedClass,
-        colors,
-        toggleColorDropdown,
-        selectColor,
+        places,
+        paginatedPlaces,
+        currentPage,
+        totalPages,
+        nextPage,
+        prevPage,
         sortDropdownVisible,
         selectedSort,
         sortOptions,
         selectedSortImage,
         toggleSortDropdown,
-        setSortOrder,
-        places,
-        deletePlace,
-        categoryId,
-        fetchPlaces,
-        categoryId,
-        resetPlace,
-        modifyPlace,
-        updateSubmit,
+        setSortOrder
       };
     }
   };
   </script>
 <style scoped>
-
+/* .full * {
+  box-sizing: border-box;
+} */
+/* .full { 
+    position: absolute;  
+    top: 40px;
+    left: 200px;
+    height: 100%;
+    width: 1600px;
+} */
 ._2,
 ._2 * {
   box-sizing: border-box;
@@ -525,7 +512,7 @@ button:hover {
   border-style: solid;
   border-color: #d2d2d2;
   border-width: 1px;
-  width: 1550px;
+  width: 1552px;
   height: 65px;
   position: absolute;
   left: 346px;
@@ -540,7 +527,7 @@ button:hover {
   line-height: 150%;
   font-weight: 500;
   position: absolute;
-  left: 465px;
+  left: 500px;
   top: 112px;
   width: 70px;
   height: 25px;
@@ -781,20 +768,39 @@ button:hover {
   transform: scale(1.1);
 }
 
+.place-color {
+  margin-right: 445px;
+  border-left: 500px;
+}
 /* 기존 ellipse 색상 유지 */
 .ellipse-2 {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
   background: #ffc1c1;
 }
 .ellipse-3 {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
   background: #c1ffe9;
 }
 .ellipse-4 {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
   background: #4285f4;
 }
 .ellipse-5 {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
   background: #fbbc05;
 }
 .ellipse-6 {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
   background: #ff0000;
 }
 
@@ -809,7 +815,8 @@ button:hover {
   display: flex;           /* 가로 정렬 */
   align-items: center;     /* 세로 중앙 정렬 */
   justify-content: space-between; 
-  width: 1550px;             /* 부모 요소 기준으로 전체 너비 사용 */
+  width: 1521px;             /* 부모 요소 기준으로 전체 너비 사용 */
+  height: 50px;
   padding: 15px;           /* 내부 여백 추가 */
   border-bottom: 1px solid #ddd; /* 각 항목 구분선 */
   border-right: 1px solid #ddd;
@@ -900,6 +907,27 @@ button:hover {
 
 .delete-image:active {
   transform: scale(0.95);
+}
+
+/* 페이징 스타일 */
+.pagination {
+  display: flex;
+  position: absolute;
+  justify-content: center;
+  margin-top: -1150px;
+  left: 1000px;
+  /* bottom: 500px; */
+}
+
+.pagination button {
+  padding: 10px;
+  margin: 0 5px;
+  cursor: pointer;
+}
+
+.pagination span {
+  align-self: center;
+  margin: 0 10px;
 }
 
 </style>
