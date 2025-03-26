@@ -8,30 +8,29 @@
     <!-- <img class="image-46" src="/src/assets/images/placeDetailComponent/image-460.png" /> -->
     
     <!-- 빈 버튼 -->
-    <button v-if="showImage46" @click="rightstarChange">
+    <!-- <button v-if="showImage46" @click="rightstarChange">
       <img class="image-46" src="/src/assets/images/placeDetailComponent/image-460.png" />
     </button>
+-->
 
-    <!-- 선택 완료 버튼 -->
-    <button v-if="showImage47" @click="rightstarChange">
-      <img class="image-47" src="/src/assets/images/placeDetailComponent/image-470.png" />
-    </button>
 
     
 
-    <div class="div2">메가커피 신대방삼거리역점</div>
-    <img class="image-35" src="/src/assets/images/placeDetailComponent/image-350.png" />
+    <div class="div2" v-text="place.name" v-if="!isEditing"></div>
+    <input  class="div2" v-model="place.name" v-if="isEditing">
+
     <img class="line-13" src="/src/assets/images/public/line-60.png" />
     <img class="line-14" src="/src/assets/images/public/line-60.png" />
 
     <!-- myplace name -->
     <!-- <div class="div3">분좋카</div> -->
-    <div class="div3">{{ placeName }}</div>
+    <!-- 카테고리 이름-->
+    <div class="div3" v-text="category.name"></div>
     <div class="line-16"></div>
 
     <!-- 카테고리 드롭 다운 -->
     <!-- <img class="group-10" src="/src/assets/images/placeDetailComponent/group-100.png" /> -->
-    <div class="dropdown-group-10">
+    <!-- <div class="dropdown-group-10">
     <select v-model="selectedColor" @change="onColorChange">
       <option value="red">red</option>
       <option value="blue">blue</option>
@@ -39,7 +38,25 @@
       <option value="yellow">yellow</option>
       <option value="purple">purple</option>
     </select>
+    </div> -->
+    <div :class="place.color" class="place-color" v-if="!isEditing"></div>
+
+    <div :class="place.color" class="place-color" v-if="isEditing">
+      <!-- 색상 선택 드롭다운 -->
+      <div class="dropdown-container" @click="toggleDropdown">
+      <div class="selected-option">
+        <div class="color-circle" :class="selectedClass"></div>
+      </div>
+      <ul v-if="isOpen" class="dropdown-menu">
+        <li v-for="(color, index) in colors" :key="index" @click="selectColor(color.className)">
+          <div class="color-circle" :class="color.className"></div>
+        </li>
+      </ul>
     </div>
+    </div>
+        
+    
+
     <div class="rectangle-23"></div>
 
     <!-- 카테고리 드롭다운 사진 -->
@@ -47,6 +64,7 @@
 
     <!-- 장소 컨텐츠 수정 입력창 -->
     <div class="div4">
+
       <template v-if="isEditing">
         <textarea 
           class="textarea-div4" 
@@ -56,7 +74,13 @@
       <template v-else>
         {{ textContent }}
       </template>
+      
+      
     </div>
+
+    <button @click="image34Click">
+      <img class="image-34" src="/src/assets/images/public/image-290.png" />
+      </button>
 
     <!-- 내용 자체 삭제 버튼 -->
     <!-- <img class="image-33" src="/src/assets/images/public/image-230.png" /> -->
@@ -67,11 +91,41 @@
 
     <!-- 내용 수정 버튼 -->
     <!-- <img class="image-34" src="/src/assets/images/public/image-290.png" /> -->
-    <button @click="image34Click">
-    <img class="image-34" src="/src/assets/images/public/image-290.png" />
+
+    
+    <!-- <div class="thumbnail">
+      <p style="font-size: 20px;">대표사진</p>
+      <img class="thumbnail-image" :src="place.thumbnail"/>
+    </div> -->
+    <div class="images">
+  사진들
+  <ul>
+    <li v-for="(photo, index) in photos" :key="index">
+      <img :src="photo.photoUrl" class="photo">
+      <img class="image-47" src="/src/assets/images/placeDetailComponent/image-470.png" v-if="photo.thumbnail" />
+      <img class="image-47" src="/src/assets/images/placeDetailComponent/image-460.png" @click="changeThumbnail(index)" v-if="!photo.thumbnail"/>
+      
+      <button @click="deletePhoto(index)" style="width: 30px; height: 30px; font-size: 20px; background-color: white; border-color: white; color: red;" v-if="isEditing">X</button>
+    </li>
+  </ul>
+</div>
+
+    <!-- <div>
+      <img class="image-35" src="/src/assets/images/placeDetailComponent/image-350.png" />
+      <img class="image-39" src="/src/assets/images/placeDetailComponent/image-390.png" />
+
+      <button v-if="showImage44" @click="leftstarChange">
+      <img class="image-44" src="/src/assets/images/placeDetailComponent/image-460.png" />
+      </button>
+
+  
+    <button v-if="showImage45" @click="leftstarChange">
+      <img class="image-45" src="/src/assets/images/placeDetailComponent/image-470.png" />
     </button>
     
-    <img class="image-39" src="/src/assets/images/placeDetailComponent/image-390.png" />
+    </div> -->
+    
+
     <div class="rectangle-51"></div>
 
     
@@ -160,20 +214,21 @@
 
     <!-- 왼쪽 대표사진 버튼 -->
     <!-- 빈 버튼 -->
-    <button v-if="showImage44" @click="leftstarChange">
-      <img class="image-44" src="/src/assets/images/placeDetailComponent/image-460.png" />
-    </button>
 
-    <!-- 선택 완료 버튼 -->
-    <button v-if="showImage45" @click="leftstarChange">
-      <img class="image-45" src="/src/assets/images/placeDetailComponent/image-470.png" />
-    </button>
 
     <!-- 사진 추가 버튼 -->
     <!-- <img class="image-48" src="/src/assets/images/placeDetailComponent/image-480.png" /> -->
-    <button @click="image48Click">
-    <img class="image-48" src="/src/assets/images/placeDetailComponent/image-480.png" />
-    </button>
+    <!-- <button @click="image48Click(placeId)">
+    <img class="image-48" src="/src/assets/images/placeDetailComponent/image-480.png" v-if="isEditing" />
+    </button> -->
+
+    <label for="photosInput" class="image-48" v-if="isEditing">
+    + add photos..<br>
+    <input id="photosInput" type="file" @change="handleFileChange" multiple />
+    <br>
+    <img v-for="(item, index) in previewSrc" :key="index" :text="item" />
+  </label>
+    <button class="modifyBtn" @click="uploadImages" v-if="isEditing">Upload</button>
 
     <img class="rectangle-42" src="/src/assets/images/placeDetailComponent/rectangle-420.png" />
 
@@ -185,71 +240,28 @@
 
     <!-- 뒤로 가기 버튼 -->
     <!-- <img class="frame" src="/src/assets/images/placeDetailComponent/Frame.png" /> -->
-    <button @click="goBack">
+    <router-link :to="`/api/v1/categories/${placeId}/places`" class="frame">
+      <img src="/src/assets/images/placeDetailComponent/Frame.png" />
+    </router-link>
+    <!-- <button @click="goBack">
     <img class="frame" src="/src/assets/images/placeDetailComponent/Frame.png" />
-    </button>
+    </button> -->
   </div>
 </template>
 
 <script setup>
 import apiClient from '@/api/axios.js';
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, ErrorCodes } from 'vue';
 import { useRoute } from 'vue-router';
-
+import { errorMessages } from 'vue/compiler-sfc';
 
 const route = useRoute();
-  const comments = ref([]);
-  const member = ref([]);
-  const placeId = ref('');
-  // const commentMemberId = ref('');
-  
-  onMounted(async() => {
-    
-      placeId.value = String(route.params.placeId);
-
-      // placeId 잘 받아오는지 확인
-      // console.log(String(route.params.placeId));
-      // console.log(placeId.value);
-
-      apiClient.get(`/comments/${placeId.value}`).then(response => {
-        comments.value = response.data;
-      }).catch(error => {
-        console.error("댓글 데이터 로딩 중 오류 발생", error);
-      });
-        
-  });
-
-  onMounted(() => {
-    apiClient.get('/members')
-      .then(response => {
-        member.value = response.data;
-      })
-      .catch(error => {
-        console.error("멤버 데이터 로딩 중 오류 발생:", error);
-      });
-  });
-  
-  
-
-// 뉴 댓글 수정
-const editComment = (index) => {
-  // const newContent = prompt('댓글 내용을 수정하세요:', comments.value[index].content);
-  const newComment = prompt(comments.value[index].comment);
-  if (newComment) {
-    comments.value[index].content = newComment;
-    // 서버에 수정 요청 추가 가능
-  }
-};
-
-// 뉴 댓글 삭제
-const deleteComment = (index) => {
-  if (confirm('댓글을 삭제하시겠습니까?')) {
-    comments.value.splice(index, 1);
-    // 서버에 삭제 요청 추가 가능
-  }
-};
-
-
+const comments = ref([]);
+const member = ref([]);
+const placeId = ref('');
+const place = ref('');
+const categoryId = ref('');
+const category = ref('');
 const selectedColor = ref("red");
 const isEditing = ref(false);
 const textContent = ref("좌석이 넓어서 수다 떨기 좋아요 메뉴들 퀄리티도 일정하고요~");
@@ -257,97 +269,207 @@ const showImage44 = ref(true);
 const showImage45 = ref(false);
 const showImage46 = ref(true);
 const showImage47 = ref(false);
+const selectedFiles = ref([]);
+const previewSrc = ref([]);
+const src = ref([]);
+const photos = ref([]);
+const modifyPlace = ref({
+  name: '',
+  color: '',
+  content: '',
+  placeId: '', // 실제로 placeId는 서버에서 받아온 값
+})
 
+onMounted(async () => {
+  placeId.value = String(route.params.placeId);
+  modifyPlace.value.placeId = placeId.value;
+  try {
+    const [commentsRes, placeRes, memberRes, photoRes] = await Promise.all([
+      apiClient.get(`/comments/${placeId.value}`),
+      apiClient.get(`/place/${placeId.value}`),
+      apiClient.get('/members'),
+      apiClient.get(`/photo/${placeId.value}`),
+    ]);
 
-  
-  
-  function pconfirmDelete(index) {
-    console.log("pconfirmDelete 버튼 클릭됨!");
-    console.log("클릭된 요소:", index.target);
-
-    const isConfirmed2 = window.confirm("나만의 장소를 삭제하시겠습니까?");
-    if (isConfirmed2) {
-      // 사용자가 확인을 눌렀을 때 실행할 코드 작성
-      alert("나만의 장소가 삭제되었습니다.");
-    } else {
-      // 사용자가 취소를 눌렀을 때 실행할 코드 작성
-      alert("삭제를 취소했습니다.");
-    }
-  }
-
-  // 편집 모드 버튼 함수
-    function image34Click() {
-    isEditing.value = !isEditing.value; // 편집 모드 토글
-  }
-
-  
-    function leftstarChange(event) {
-      console.log("leftstarChange 버튼 클릭됨!");
-      console.log("클릭된 요소:", event.target);
-    // 이미지 상태를 전환
-    showImage44.value = !showImage44.value;
-    showImage45.value = !showImage45.value;
-  }
-
-  function rightstarChange(event) {
-    console.log("rightstarChange 버튼 클릭됨!");
-    console.log("클릭된 요소:", event.target);
-    // 이미지 상태를 전환
-    showImage46.value = !showImage46.value;
-    showImage47.value = !showImage47.value;
-  }
-  //   image44Click(event) {
-  //   console.log("image-44 버튼 클릭됨!");
-  //   console.log("클릭된 요소:", event.target);
-  // },
-  //   image45Click(event) {
-  //   console.log("image-45 버튼 클릭됨!");
-  //   console.log("클릭된 요소:", event.target);
-  // },
-
-
-    function image48Click(event) {
-    console.log("image-48 버튼 클릭됨!");
-    console.log("클릭된 요소:", event.target);
-  }
-    function cconfirmDelete() {
-    // console.log("image-50 버튼 클릭됨!");
-    // console.log("클릭된 요소:", event.target);
-
-    const isConfirmed = window.confirm("댓글을 삭제하시겠습니까?");
-    if (isConfirmed) {
-      // 사용자가 확인을 눌렀을 때 실행할 코드 작성
-      alert("댓글이 삭제되었습니다.");
-    } else {
-      // 사용자가 취소를 눌렀을 때 실행할 코드 작성
-      alert("삭제를 취소했습니다.");
-    }
-  }
-
-  // 구 댓글 수정 함수
-    // function image49Click(event) {
-  //   function editComment(index) {
-  //   console.log("editComment 버튼 클릭됨!");
-  //   console.log("클릭된 요소:", index.target);
-  // }
-
-    function goBack(event) {
-    console.log("frame 버튼 클릭됨!");
-    console.log("클릭된 요소:", event.target);
-    // 브라우저의 이전 페이지로 이동
-    window.history.back();
-
-  }
-  
-  function onColorChange(event) {
-    console.log("선택된 색상:", selectedColor.value);
+    comments.value = commentsRes.data;
+    place.value = placeRes.data;
+    console.log(place.value);
     
-  }
-    function writeClick(event) {
-    console.log("write 버튼 클릭됨!");
-    console.log("클릭된 요소:", event.target);
+    categoryId.value = place.value.categoryId;
+    member.value = memberRes.data;
+
+    console.log(photoRes.data);
+    
+    
+    photoRes.data.forEach((e) => {
+      photos.value.push(e);
+    });
   
+    if (categoryId.value) {
+      const categoryRes = await apiClient.get(`/categories/find-one/${categoryId.value}`);
+      category.value = categoryRes.data;
+    }
+  } catch (error) {
+    console.error("데이터 로딩 중 오류 발생", error);
   }
+});
+
+const changeThumbnail = async(index) => {
+  
+  if(confirm('대표사진을 변경하시겠습니까?')){
+    await apiClient.get(`photo/thumbnail/${photos.value[index].photoId}`)
+    window.location.reload();  // 페이지 새로고침
+  }
+}
+
+const deletePhoto = async(index) => {
+  try{
+    await apiClient.delete(`/photo/${photos.value[index].photoId}`)
+    window.location.reload();  // 페이지 새로고침
+  } catch (error) {
+  
+    
+    
+    alert(error.response.data); 
+    console.error("삭제 중 오류 발생", error);
+    isEditing.value = false;
+  }
+  
+}
+
+const editComment = (index) => {
+  const newComment = prompt("댓글을 수정하세요:", comments.value[index].comment);
+  if (newComment) {
+    comments.value[index].comment = newComment;
+  }
+};
+
+const deleteComment = (index) => {
+  if (confirm('댓글을 삭제하시겠습니까?')) {
+    comments.value.splice(index, 1);
+  }
+};
+
+const pconfirmDelete = () => {
+  if (confirm("나만의 장소를 삭제하시겠습니까?")) {
+    alert("나만의 장소가 삭제되었습니다.");
+  } else {
+    alert("삭제를 취소했습니다.");
+  }
+};
+
+const image34Click = () => {
+  isEditing.value = !isEditing.value;
+};
+
+const leftstarChange = () => {
+  showImage44.value = !showImage44.value;
+  showImage45.value = !showImage45.value;
+};
+
+const rightstarChange = () => {
+  showImage46.value = !showImage46.value;
+  showImage47.value = !showImage47.value;
+};
+
+const image48Click = () => {
+  console.log("image-48 버튼 클릭됨!");
+};
+
+const cconfirmDelete = () => {
+  if (confirm("댓글을 삭제하시겠습니까?")) {
+    alert("댓글이 삭제되었습니다.");
+  }
+};
+
+const goBack = () => {
+  window.history.back();
+};
+
+const onColorChange = () => {
+  console.log("선택된 색상:", selectedColor.value);
+};
+
+const writeClick = () => {
+  console.log("write 버튼 클릭됨!");
+};
+
+const handleFileChange = (event) => {
+  const files = event.target.files;
+  selectedFiles.value = Array.from(files);
+  previewSrc.value = selectedFiles.value.map(file => URL.createObjectURL(file));
+};
+
+const uploadImages = async () => {
+
+  if (!place.photoUrls) {
+  place.photoUrls = [];
+}
+
+  const formData = new FormData();
+  if(selectedFiles.value.length > 0){
+    selectedFiles.value.forEach((file, index) => {
+    formData.append("multipartFiles", file, `image${index}.jpg`);
+  });
+  }
+
+  formData.append("placeId", placeId.value);
+
+  try {
+    const response = await apiClient.post("/photo/upload-photos", formData, {
+      headers: { "Content-Type": "multipart/form-data" }
+    });
+    
+    // 서버에서 반환된 이미지 URL을 받아서 place.photoUrls에 추가
+    const uploadedImageUrls = response.data;  // 서버에서 반환된 이미지 URL 배열
+    place.photoUrls.push(...uploadedImageUrls);
+
+    // console.log("Uploaded Photo IDs:", uploadedImageUrls);
+  } catch (error) {
+    console.error("Upload failed:", error);
+    alert("업로드 실패!");
+  }
+
+  submitModification()
+
+};
+
+const submitModification = async () => {
+  const placeRequestDto = {
+    placeId: placeId.value,
+    name: place.value.name,
+    color: place.value.color,
+    content: place.value.content,
+  };
+
+  console.log(placeRequestDto);
+  
+
+  try {
+    const response = await apiClient.put('/place', placeRequestDto);
+    console.log('업데이트 성공:', response.data);
+    alert('장소가 수정되었습니다!');
+    isEditing.value = false;  // 편집 모드 종료
+    place.value = response.data;  // 수정된 데이터를 받아서 UI 업데이트
+    window.location.reload();  // 페이지 새로고침
+  } catch (error) {
+    console.error('업데이트 실패:', error);
+    alert('수정에 실패했습니다. 다시 시도해 주세요.');
+  }
+};
+
+const dataURItoBlob = (dataURI) => {
+  const byteString = atob(dataURI.split(',')[1]);
+  const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+  const ab = new ArrayBuffer(byteString.length);
+  const ia = new Uint8Array(ab);
+  for (let i = 0; i < byteString.length; i++) {
+    ia[i] = byteString.charCodeAt(i);
+  }
+  return new Blob([ab], { type: mimeString });
+};
+
+
 </script>
 
 <style scoped>
@@ -555,9 +677,6 @@ const showImage47 = ref(false);
 .image-47 {
   width: 25px;
   height: 25px;
-  position: absolute;
-  left: 1278px;
-  top: 814px;
   object-fit: cover;
   aspect-ratio: 1;
 }
@@ -565,12 +684,12 @@ const showImage47 = ref(false);
   color: #000000;
   text-align: left;
   font-family: "Inter-Regular", sans-serif;
-  font-size: 30px;
+  font-size: 40px;
   font-weight: 400;
   position: absolute;
-  left: 684px;
-  top: 161px;
-  width: 380px;
+  left: 800px;
+  top: 150px;
+  width: 380px; 
   height: 38px;
 }
 .image-35 {
@@ -604,11 +723,11 @@ const showImage47 = ref(false);
   color: #000000;
   text-align: left;
   font-family: "Inter-Regular", sans-serif;
-  font-size: 30px;
+  font-size: 20px;
   font-weight: 400;
   position: absolute;
   left: 461px;
-  top: 164px;
+  top: 200px;
   width: 100px;
   height: 43px;
 }
@@ -669,40 +788,12 @@ padding: 5px;
   top: 171px;
   overflow: visible;
 }
-
-/* 장소 컨텐츠 영역 */
-.div4 {
-  color: #000000;
-  text-align: left;
-  font-family: "Inter-Regular", sans-serif;
-  font-size: 24px;
-  font-weight: 400;
-  position: absolute;
-  left: 488px;
-  top: 910px;
-  width: 776px;
-  height: 95px;
-}
-.textarea-div4 {
-  width: 100%;
-  height: 100%;
-  border: none;
-  resize: none; 
-  outline: none; 
-  padding: 10px; 
-  font-family: "Inter-Regular", sans-serif;
-  font-size: 24px;
-  color: #000000;
-  background-color: #ffffff;
-  box-sizing: border-box; 
-  overflow: scroll;
-}
 .image-33 {
   width: 40px;
   height: 40px;
   position: absolute;
-  left: 1375px;
-  top: 976px;
+  left: 450px;
+  top: 100px;
   object-fit: cover;
   aspect-ratio: 1;
 }
@@ -710,8 +801,8 @@ padding: 5px;
   width: 42px;
   height: 42px;
   position: absolute;
-  left: 1314px;
-  top: 976px;
+  left: 400px;
+  top: 100px;
   object-fit: cover;
   aspect-ratio: 1;
 }
@@ -723,6 +814,37 @@ padding: 5px;
   top: 301px;
   object-fit: cover;
   aspect-ratio: 447/503;
+}
+
+.ellipse-2 {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #ffc1c1;
+}
+.ellipse-3 {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #c1ffe9;
+}
+.ellipse-4 {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #4285f4;
+}
+.ellipse-5 {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #fbbc05;
+}
+.ellipse-6 {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #ff0000;
 }
 
 /* 구 삭제 버튼 */
@@ -1055,5 +1177,71 @@ aspect-ratio: 1;
   left: 1370px;
   top: 97px;
   overflow: visible;
+}
+.place-color {
+  position: absolute;
+  left: 1200px;
+  top: 170px;
+}
+
+.thumbnail {
+  position: absolute;
+  left: 550px;
+  top: 300px;
+  margin-top: 500px;
+}
+.thumbnail-image {
+  width: 100%;
+  height: 100%;
+}
+
+.images {
+  font-size: 30px;
+  position: absolute;
+  left: 500px;
+  top: 650px;
+  width: 700px;
+  overflow: scroll;
+  margin-top: 150px;
+}
+.photo {
+  width: 50%;
+  height: 50%;
+}
+
+/* 장소 컨텐츠 영역 */
+.div4 {
+  color: #000000;
+  text-align: left;
+  font-family: "Inter-Regular", sans-serif;
+  font-size: 24px;
+  font-weight: 400;
+  width: 776px;
+  height: 400px;
+  position: absolute;
+  left: 500px;
+  top: 370px;;
+  overflow: scroll;
+}
+.textarea-div4 {
+  width: 100%;
+  height: 100%;
+  border: none;
+  resize: none; 
+  outline: none; 
+  padding: 10px; 
+  font-family: "Inter-Regular", sans-serif;
+  font-size: 24px;
+  color: #000000;
+  background-color: #ffffff;
+  box-sizing: border-box; 
+}
+.modifyBtn {
+  width: 80px;
+  height: 50px;
+  font-size: 20px;
+  position: absolute;
+  left: 1150px;
+  top: 280px;
 }
 </style>
