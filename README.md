@@ -1,7 +1,6 @@
 # MapPride - by Maptist
 <br>
-
-![ChatGPT Image 2025년 3월 26일 오전 09_46_48](https://github.com/user-attachments/assets/edfd7953-960b-4485-b46d-91a9bbdf8f9a)
+![mapbusim_logo_resized](https://github.com/user-attachments/assets/0d400c83-0645-4262-a42f-95163a2db7bb)
 
 <br><br>
 
@@ -45,14 +44,14 @@
 # 기술스택
 
 
-**backend**
+### BACKEND
 <br>
 ![java](https://github.com/user-attachments/assets/a9cd03e7-07d6-477e-b3dd-32e7a6ae1e08) ![jpa](https://github.com/user-attachments/assets/dd9fdaec-6850-4401-9c67-af2da34ddf5d) ![postman](https://github.com/user-attachments/assets/4bcd5043-6841-4cd1-b864-dec4dc39f918) ![swagger](https://github.com/user-attachments/assets/607806d1-b228-4d6a-8a87-45c60ccecc8d) ![gradle](https://github.com/user-attachments/assets/3e2aecfc-6ca4-4c16-b05a-857ea967c265) ![jwt](https://github.com/user-attachments/assets/3e2aecfc-6ca4-4c16-b05a-857ea967c265) ![lombok](https://github.com/user-attachments/assets/1369e5f7-ef44-40d8-9502-188ccc257b89)
 <img src="https://img.shields.io/badge/SpringBoot-10B146?style=for-the-badge&logo=SpringBoot&logoColor=white">
 <img src="https://img.shields.io/badge/SpringSecurity-3B66BC?style=for-the-badge&logo=SpringSecurity&logoColor=white">
 
 
-**Frontend**
+### FRONTEND
 <br>
 ![javascript](https://github.com/user-attachments/assets/8f53173c-875e-4499-a047-0179e78bb4c9)
 ![html](https://github.com/user-attachments/assets/9b137699-cac1-4ae0-a9de-3a96df93a570)
@@ -60,17 +59,21 @@
 ![vue](https://github.com/user-attachments/assets/89ddc02d-b904-4ab8-a51e-dbcb3511274f)
 ![axios](https://github.com/user-attachments/assets/e83b6c8a-b20f-4582-8526-51feb9899f46)
 
-**Design**
+### DESIGN
+<br>
 ![figma](https://github.com/user-attachments/assets/49ff7e95-8ab9-4130-ae90-975236ef14f8)
 
-**database**
+### DATABASE
 <br>
 ![redis](https://github.com/user-attachments/assets/df929d81-ce2f-4853-97fd-cdf7bf45907e) ![mariadb](https://github.com/user-attachments/assets/19a0ad09-804d-4303-80bd-32cafdae0e6f)
 
-
- **etc tools**
-
-![git](https://github.com/user-attachments/assets/d04521ee-046d-41dd-ac18-1b7f40dd38ed) ![github](https://github.com/user-attachments/assets/6e0d5234-61c3-4fda-80b4-c54f7b058b57) ![intellij](https://github.com/user-attachments/assets/25d426ed-e30e-4619-9968-11375adba8b9) ![vscode](https://github.com/user-attachments/assets/c9563ad4-0d59-4647-a204-bbedf1ba9479) 
+### DEPLOYMENT
+<br>
+![git](https://github.com/user-attachments/assets/d04521ee-046d-41dd-ac18-1b7f40dd38ed) ![github](https://github.com/user-attachments/assets/6e0d5234-61c3-4fda-80b4-c54f7b058b57)
+ 
+ ### developing tool
+<br>
+![intellij](https://github.com/user-attachments/assets/25d426ed-e30e-4619-9968-11375adba8b9) ![vscode](https://github.com/user-attachments/assets/c9563ad4-0d59-4647-a204-bbedf1ba9479) 
 
 
 <br><br>
