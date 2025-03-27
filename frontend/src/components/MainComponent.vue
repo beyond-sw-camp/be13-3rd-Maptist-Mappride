@@ -31,7 +31,7 @@ const props = defineProps({
 // map 객체를 ref로 정의
 const map = ref(null);
 
-// categoryId 들고 있을 데이터
+// 신규 생성할 Category 에서 categoryId 를 들고 있을 데이터
 let categoriesId = '';
 
 // 지도에서 빈 지도에서 클릭시 저장할 배열
@@ -54,30 +54,64 @@ onMounted(() => {
 
       // 클릭이벤트를 적용하여 경고창으로 위도 경도를 봅니다.
       naver.maps.Event.addListener(map.value, 'click', function(e){
-        // 기존 마커들과 정보창 삭제
-        markerMap.forEach(markerData => {
-          markerData.setMap(null);  // 마커 삭제
-        });
-        markerMap = [];
-
-        const marker = new naver.maps.Marker({
-          position: e.coord,
-          map: map.value,
-          icon: {
-            url: "http://static.naver.com/maps2/icon/marker/marker_blue.png",  // 기본 마커 아이콘
-            size: new naver.maps.Size(60, 80),  // 아이콘 크기 (너비: 40px, 높이: 60px)
-            anchor: new naver.maps.Point(20, 60)  // 마커의 중심을 아이콘의 하단으로 맞추기
-          }
-        });
-
-        markerMap.push(marker);
 
         if (categoriesId)
         {
+            // 기존 마커들과 정보창 삭제
+            markerMap.forEach(markerData => {
+              markerData.marker.setMap(null);  // 마커 삭제
+              if (markerData.infowindow.getMap()) {
+                markerData.infowindow.close();  // 열린 정보창 닫기
+              }
+            });
+            markerMap = [];  // 배열 초기화
+
+            const marker = new naver.maps.Marker({
+            position: e.coord,
+            map: map.value,
+            icon: {
+              url: "http://static.naver.com/maps2/icon/marker/marker_blue.png",  // 기본 마커 아이콘
+              size: new naver.maps.Size(60, 80),  // 아이콘 크기 (너비: 40px, 높이: 60px)
+              anchor: new naver.maps.Point(20, 60)  // 마커의 중심을 아이콘의 하단으로 맞추기
+            }
+          });
+
+          // 정보 창 내용 구성
+          const contentString = [
+            '<div class="iw_inner" style="width: 360px; height: 120px; padding: 5px; font-size: 20px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">',
+              `   <h3>신규 장소를 생성하시겠습니까?</h3>`,
+              `   <a href="/api/v1/new-place">새로운 장소 만들기</a>`,
+            '</div>'
+          ].join('');
+
+          const infowindow = new naver.maps.InfoWindow({
+            content: contentString,
+          });
+
+          // 마커 클릭 시 정보 창을 띄우도록 이벤트 추가
+          naver.maps.Event.addListener(marker, 'click', () => {
+            // 이미 정보 창이 열려있으면 닫고, 그렇지 않으면 열도록 처리
+            if (infowindow.getMap()) {
+              infowindow.close();
+            } else {
+              infowindow.open(map.value, marker);
+            }
+
+          const point = new naver.maps.LatLng(place.latitude, place.longitude);
+            map.value.setCenter(point);  // 해당 위치로 지도 중심 이동
+            map.value.setZoom(16);
+
           piniaStore.getLatitude(e.coord.lat());
           piniaStore.getLongitude(e.coord.lng());
           piniaStore.getCategoryId(categoriesId);
+        });
         }
+
+        // 생성한 마커와 정보창을 markers 배열에 저장
+        markerMap.push({
+          marker: marker,
+          infowindow: infowindow
+        });
     });
   }
 });
@@ -181,6 +215,8 @@ const onCategoryButtonClick = async (category) => {
 
     if (response.status === 200) {
       const places = response.data;
+
+      categoriesId = category.categoryId;
 
       // 기존 마커들과 정보창 삭제
       markers.forEach(markerData => {

@@ -100,10 +100,14 @@
     try {
       txtSearchModel.value = event.target.value;
 
+      console.log(txtSearchModel.value);
+
       if (route.name === 'Main') {
         const response = await apiClient.get(`/members/name?name=${txtSearchModel.value}`);
 
         if (response.status === 200) {
+          console(response.data);
+
           filteredData.value = response.data;
         } else {
           console.error('API 요청 실패:', response.status);
