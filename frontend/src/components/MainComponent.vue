@@ -123,6 +123,20 @@ const categoryItems = computed(() => piniaStore.categories);
 watch(() => categoryItems.value, (newCategories) => {
   if (!map.value) return;
 
+      // 기존 마커들과 정보창 삭제
+      markers.forEach(markerData => {
+        markerData.marker.setMap(null);  // 마커 삭제
+        if (markerData.infowindow.getMap()) {
+          markerData.infowindow.close();  // 열린 정보창 닫기
+        }
+      });
+      markers = [];  // 배열 초기화
+
+      markerMap.forEach(markerData => {
+          markerData.setMap(null);  // 마커 삭제
+      });
+      markerMap = [];
+
   // 버튼을 다시 생성하여 위치를 조정
   createCategoryButtons(newCategories);
 });
@@ -176,6 +190,11 @@ const onCategoryButtonClick = async (category) => {
         }
       });
       markers = [];  // 배열 초기화
+
+      markerMap.forEach(markerData => {
+          markerData.setMap(null);  // 마커 삭제
+      });
+      markerMap = [];
 
       // places가 비어있으면 알림 메시지 표시
       if (places.length === 0) {
