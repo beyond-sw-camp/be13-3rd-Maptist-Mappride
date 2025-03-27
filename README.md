@@ -184,6 +184,14 @@
 ![Image](https://github.com/user-attachments/assets/10d59789-7d3e-4fb3-bb93-693fae454f58)
 
 
+
+## 나만의 장소 생성
+
+![Image](https://github.com/user-attachments/assets/11ac027e-0b8c-4899-970e-b21d4de9e62f)
+
+![Image](https://github.com/user-attachments/assets/b8a6a56e-5b32-44a1-a1ad-33282d1c2267)
+
+
 ## 타인의 카테고리 / 장소 조회
 ![Image](https://github.com/user-attachments/assets/5c805032-3469-4fc1-958c-b751a744c81c)
 ![Image](https://github.com/user-attachments/assets/198a1f2a-212b-4baa-b05d-defdbc91e282)
