@@ -94,16 +94,13 @@
 <script>
 import apiClient from '@/api/axios.js';
 import { ref, onMounted,computed, watch,  } from 'vue';
+import { usePiniaStore } from '@/stores/pinia.js';
+import MyCategories from '@/components_Back/MyCategories.vue';
 
 export default {
-  name: "MyCategories",
-  props: {
-    searchQuery: {
-      type: String,
-      default: ''
-    }
-  },
   setup(props) {
+    // Pinia store에서 category 값을 가져옵니다
+    const piniaStore = usePiniaStore();
     const newCategoryName = ref('');  // 카테고리 이름 입력
     const newSelectedOption = ref('O');  // 기본적으로 X로 설정
     const categories = ref([]);  // 기존 카테고리 목록
@@ -112,39 +109,22 @@ export default {
 
     // 페이지네이션 관련 변수
     const currentPage = ref(1);  // 현재 페이지
-      const itemsPerPage = 8;      // 한 페이지당 항목 수
-      const totalPages = ref(1);   // 총 페이지 수
+    const itemsPerPage = 8;      // 한 페이지당 항목 수
+    const totalPages = ref(1);   // 총 페이지 수
 
-      // 검색 관련 변수
-    // const filteredCategories = ref([]);
+    const categoryName = computed(() => piniaStore.myCategoryName);
+  
+    // 카테고리가 바뀔 때마다 실행되는 watch
+    watch(() => categoryName.value, (newCategories) => {
 
-    // 페이지네이션에 맞는 데이터만 표시하도록 처리
-    // const paginatedCategories = computed(() => {
-    //   const startIndex = (currentPage.value - 1) * itemsPerPage;
-    //   const endIndex = startIndex + itemsPerPage;
-    //   return categories.value.slice(startIndex, endIndex);
-    // });
-
-    // // 페이지네이션을 고려하여 표시할 카테고리 목록
-    // const paginatedCategories = computed(() => {
-    //   const startIndex = (currentPage.value - 1) * itemsPerPage;
-    //   const endIndex = startIndex + itemsPerPage;
-    //   return categories.value.slice(startIndex, endIndex);
-    // });
-
+      categories.value = [];
+      categories.value = newCategories;
+      initializeCategoryOptions(); // 데이터 로딩 후 초기화
     
-    // 페이지 이동 함수
-    const nextPage = () => {
-        if (currentPage.value < totalPages.value) {
-          currentPage.value++;
-        }
-      };
 
-      const prevPage = () => {
-        if (currentPage.value > 1) {
-          currentPage.value--;
-        }
-      };
+    });
+
+  
 
       const fetchCategories = async () => {
       try {
@@ -169,7 +149,7 @@ export default {
 
     // 검색 버튼 클릭 시 처리
     const btnSearchClick = () => {
-      filteredCategories.value = categories.value.filter(category => category.name.includes(newCategoryName.value));
+      // filteredCategories.value = categories.value.filter(category => category.name.includes(newCategoryName.value));
       currentPage.value = 1; // 검색 시 페이지를 1로 리셋
       totalPages.value = Math.ceil(filteredCategories.value.length / itemsPerPage); // 검색 후 총 페이지 수 업데이트
     };
@@ -233,12 +213,12 @@ export default {
         
         // 서버에서 반환된 카테고리 데이터로 새 카테고리 추가
         categories.value.push(response.data);
-        filteredCategories.value = categories.value;
+        // filteredCategories.value = categories.value;
 
         // 추가 후, 입력 필드 초기화
         newCategoryName.value = '';
         newSelectedOption.value = 'X'; // 기본값으로 초기화
-        totalPages.value = Math.ceil(filteredCategories.value.length / itemsPerPage);
+        // totalPages.value = Math.ceil(filteredCategories.value.length / itemsPerPage);
 
         initializeCategoryOptions();
       } catch (error) {

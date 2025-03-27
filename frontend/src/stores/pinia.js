@@ -23,6 +23,22 @@ export const usePiniaStore = defineStore('auth', () => {
     }
     };
 
+    const getMyCategories = async() => {
+        try {
+            const response = await apiClient.get('/categories');
+
+            console.log(response.data);
+
+            if (response.status === 200) {
+              categories.value = response.data;
+            } else {
+              console.error('API 요청 실패:', response.status);
+            }
+          } catch (error) {
+            console.error('API 요청 실패:', error);
+            alert('검색 실패. 다시 시도해주세요.');
+          }
+    }
 
     // newPlaceComponent.vue 에서 사용
     let latitude = '';
@@ -42,18 +58,15 @@ export const usePiniaStore = defineStore('auth', () => {
     };
 
     // MyCategoryComponent.vue 에서 사용
-    const myCategories = ref([]);
+    const myCategoryName = ref([]);
 
-    const getMyCategories = async (categoryName) => {
+    const getMyCategoryName = async (categoryName) => {
     try{
-        alert('들어오나용');
-        const response = await apiClient.get(`/categories/${categoryName}`);
+        const response = await apiClient.get(`/categories/findCategory/${categoryName}`);
 
         if (response.status === 200) {
-            myCategories.value = response.data;
 
-            alert(myCategories.value);
-            alert(response.data);
+            myCategoryName.value = response.data;
 
         } else {
             console.error('API 요청 실패:', response.status);
@@ -65,5 +78,6 @@ export const usePiniaStore = defineStore('auth', () => {
     }
     };
 
-    return { categories, getCategory, latitude, getLatitude, longitude, getLongitude, categoryId, getCategoryId, getMyCategories};
+    return { categories, getCategory, latitude, getLatitude, longitude, getLongitude
+        , categoryId, getCategoryId, getMyCategories, myCategoryName, getMyCategoryName};
 });

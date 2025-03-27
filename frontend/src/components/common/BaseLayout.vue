@@ -141,7 +141,10 @@
   const btnSearchClick = async () => {
     try {
       if(route.name === 'Categories'){
-        piniaStore.getMyCategories(txtSearchModel.value);
+
+        if (!txtSearchModel.value) return;
+
+        piniaStore.getMyCategoryName(txtSearchModel.value);
       }
       else if (route.name === 'Main') {
 
