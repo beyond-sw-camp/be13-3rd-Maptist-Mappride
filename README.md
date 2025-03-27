@@ -97,21 +97,78 @@
 
 <br>
 
-## 화면설계서 
+## 화면설계서 with.피그마
 
-![login](https://github.com/user-attachments/assets/0f03b304-251c-437b-9460-47cf07da9bff)
-![main](https://github.com/user-attachments/assets/19f8d4c9-2f91-4ad8-9d49-c0432986091f)
-![newplace](https://github.com/user-attachments/assets/cb0334fb-ecf0-468f-9c1f-65e84b8c5d65)
-![category](https://github.com/user-attachments/assets/270a0a76-93c8-4489-8a08-cce17478c7b1)
-![place](https://github.com/user-attachments/assets/26f9b1c5-e290-4aee-9aa7-7fb586d1e912)
-![placeDetail](https://github.com/user-attachments/assets/24ff1d64-a51f-4f6d-9c13-8f8774d6b030)
-![mypage](https://github.com/user-attachments/assets/a6482dcd-90af-41c3-bd11-2dd294cc0a6e)
+<details>
+<summary> <b> 나만의 장소 상세보기, 댓글 페이지 </b> </summary>
+<div markdown="1">
 
+![나만의 장소 상세보기, 댓글 페이지](https://github.com/user-attachments/assets/9272eed7-697e-4639-bac4-c5437282bcdd)
+
+</div>
+</details>
+
+<details>
+<summary> <b> 나만의 장소 생성 페이지 </b> </summary>
+<div markdown="1">
+
+![나만의 장소 생성 페이지](https://github.com/user-attachments/assets/9e73adeb-8557-4b1f-bb98-4cb50eb668d5)
+
+</div>
+</details>
+
+<details>
+<summary> <b> 로그인 페이지 </b> </summary>
+<div markdown="1">
+
+![로그인 페이지](https://github.com/user-attachments/assets/73a24de2-8156-40d9-87c3-aa8a9be2e6ac)
+
+</div>
+</details>
+
+<details>
+<summary> <b> 마이 페이지 </b> </summary>
+<div markdown="1">
+
+![마이 페이지](https://github.com/user-attachments/assets/3f631f65-9b97-40ab-8d17-51c44f8f9df6)
+
+</div>
+</details>
+
+<details>
+<summary> <b> 지도, 검색 페이지 </b> </summary>
+<div markdown="1">
+
+![지도, 검색 페이지](https://github.com/user-attachments/assets/a845a918-c812-482a-a6f9-fe8d2cb947df)
+
+</div>
+</details>
+
+<details>
+<summary> <b> 카테고리 관리 페이지 1 </b> </summary>
+<div markdown="1">
+
+![카테고리 관리 페이지 1](https://github.com/user-attachments/assets/eb556d1a-ce6f-4e7b-94f5-c7844b1be455)
+
+</div>
+</details>
+
+<details>
+<summary> <b> 카테고리 관리 페이지 2 </b> </summary>
+<div markdown="1">
+
+![카테고리 관리 페이지 2](https://github.com/user-attachments/assets/a59e3b3a-d821-4999-a970-215090f5c4e0)
+
+</div>
+</details>
 
 <br><br>
 
 # 테스트 계획 및 결과 보고서(시연결과 캡쳐등)
 
+스웨거는 중요한거 캡쳐만 하고 플젝 링크달아서 발표때 직접할지?
+
+결과 다 캡쳐해서 보여줄지 결정 하시구욤
 
 ![myplace](https://github.com/user-attachments/assets/8624fb76-1700-4e95-8c49-c9e313d4e84a)
 
@@ -120,3 +177,6 @@
 
 
 ![mypage](https://github.com/user-attachments/assets/dffb9979-687b-4500-8e7f-4f1d36070ce7)
+
+
+
