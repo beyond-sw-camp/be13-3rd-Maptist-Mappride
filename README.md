@@ -169,18 +169,22 @@
 ## 소셜로그인
 ![Image](https://github.com/user-attachments/assets/55346de1-63be-4017-9e1a-a503cd02702a)
 
-## 카테고리 생성
+## 마이페이지
+![Image](https://github.com/user-attachments/assets/6cad3bea-603a-4130-a1fa-3a9568bc220e)
+![Image](https://github.com/user-attachments/assets/8dd03504-df50-42f5-811f-44bc42487ed3)
+
+## 카테고리 기능
 ![Image](https://github.com/user-attachments/assets/b22d739e-2b5b-4eb5-8588-ee818eaa9e6b)
+![Image](https://github.com/user-attachments/assets/3501c5e3-3223-497b-b385-a3310e049539)
+![Image](https://github.com/user-attachments/assets/9092d154-68fa-4d44-a4b5-19391551f404)
+
 ## 댓글 기능
 ![Image](https://github.com/user-attachments/assets/3ea9e977-fb08-4b9b-b766-8b93536dc4b3)
 ![Image](https://github.com/user-attachments/assets/4ca5ccfc-b85a-4cd2-ba91-ab764cb18d40)
 ![Image](https://github.com/user-attachments/assets/10d59789-7d3e-4fb3-bb93-693fae454f58)
 
-![Image](https://github.com/user-attachments/assets/6cad3bea-603a-4130-a1fa-3a9568bc220e)
-![Image](https://github.com/user-attachments/assets/8dd03504-df50-42f5-811f-44bc42487ed3)
-![Image](https://github.com/user-attachments/assets/3501c5e3-3223-497b-b385-a3310e049539)
-![Image](https://github.com/user-attachments/assets/56c015f5-7622-416e-bd74-ad4ede0d359e)
-![Image](https://github.com/user-attachments/assets/9092d154-68fa-4d44-a4b5-19391551f404)
+
+## 타인의 카테고리 / 장소 조회
 ![Image](https://github.com/user-attachments/assets/5c805032-3469-4fc1-958c-b751a744c81c)
 ![Image](https://github.com/user-attachments/assets/198a1f2a-212b-4baa-b05d-defdbc91e282)
 
