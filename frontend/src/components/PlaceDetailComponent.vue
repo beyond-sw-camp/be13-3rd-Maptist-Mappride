@@ -82,7 +82,7 @@
     <!-- 내용 자체 삭제 버튼 -->
     <!-- <img class="image-33" src="/src/assets/images/public/image-230.png" /> -->
     <!-- <button @click="image33Click"> -->
-    <button @click.stop="pconfirmDelete">
+    <button @click.stop="confirmDelete()">
     <img class="image-33" src="/src/assets/images/public/image-230.png" />
     </button>
 
@@ -237,7 +237,7 @@
 
     <!-- 뒤로 가기 버튼 -->
     <!-- <img class="frame" src="/src/assets/images/placeDetailComponent/Frame.png" /> -->
-    <router-link :to="`/api/v1/categories/${placeId}/places`" class="frame">
+    <router-link :to="`/api/v1/categories/${categoryId}/places`" class="frame">
       <img src="/src/assets/images/placeDetailComponent/Frame.png" />
     </router-link>
     <!-- <button @click="goBack">
@@ -249,9 +249,10 @@
 <script setup>
 import apiClient from '@/api/axios.js';
 import { ref, onMounted, ErrorCodes } from 'vue';
-import { useRoute } from 'vue-router';
+import { useRoute,useRouter  } from 'vue-router';
 import { errorMessages } from 'vue/compiler-sfc';
 
+const router = useRouter();
 const route = useRoute();
 const comments = ref([]);
 const member = ref([]);
@@ -365,7 +366,7 @@ const editComment = async(index) => {
 
     const CommentUpdateDto = {
       id : comments.value[index].commentId,
-      comment : comments.value[index].comment,
+      comment : comments.value[index].comment,confirmDelete
     }
 
     console.log(CommentUpdateDto);
@@ -386,9 +387,21 @@ const deleteComment = async (index) => {
   }
 };
 
-const pconfirmDelete = () => {
+const confirmDelete = async() => {
   if (confirm("나만의 장소를 삭제하시겠습니까?")) {
-    alert("나만의 장소가 삭제되었습니다.");
+
+
+    const response = await apiClient.delete(`/place/${placeId.value}`);
+
+    if(response.status === 200){
+      alert("나만의 장소가 삭제되었습니다.");
+    } else {
+      console.log(response.data);
+      
+      alert("삭제 중 오류 발생");
+    }
+    router.go(-1); // 이전 페이지로 이동
+
   } else {
     alert("삭제를 취소했습니다.");
   }

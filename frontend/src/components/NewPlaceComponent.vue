@@ -38,153 +38,167 @@
   </div>
 </template>
 
-<script>
-import { ref, reactive } from 'vue';
+<script setup>
+import { ref, reactive, onMounted, watch } from 'vue';
 import apiClient from '@/api/axios.js';
+import { usePiniaStore } from '@/stores/pinia.js';
 
-export default {
-  name: "Component",
-  data() {
-    return {
-      newPlace: reactive({
-        categoryId: 43,
-        name: '',
-        latitude: 36,
-        longitude: 127,
-        color: 'ellipse-2', 
-        content: '',
-        thumbnail: null,  // 대표 이미지 (썸네일)
-        multipartFiles: []  // 여러 이미지
-      }),
-      isOpen: false, // 드롭다운 열림 여부
-      selectedClass: 'ellipse-2', // 기본 선택된 색상
-      colors: [
-        { className: "ellipse-2" },
-        { className: "ellipse-3" },
-        { className: "ellipse-4" },
-        { className: "ellipse-5" },
-        { className: "ellipse-6" }
-      ],
-      src: [],
-    };
-  },
-  methods: {
-    async submit() {
-      try {
-        const formData = new FormData();
+// Pinia store에서 category 값을 가져옵니다
+const piniaStore = usePiniaStore();
 
-        // 일반 텍스트 필드 추가
-        formData.append('name', this.newPlace.name);
-        formData.append('content', this.newPlace.content);
-        formData.append('color', this.newPlace.color);
-        formData.append('latitude', this.newPlace.latitude);
-        formData.append('longitude', this.newPlace.longitude);
-        formData.append('categoryId', this.newPlace.categoryId);
+const newPlace = reactive({
+  categoryId: 43,
+  name: '',
+  latitude: 36,
+  longitude: 127,
+  color: 'ellipse-2',
+  content: '',
+  thumbnail: null,  // 대표 이미지 (썸네일)
+  multipartFiles: []  // 여러 이미지
+});
 
-        // 썸네일 이미지가 있는 경우 추가
-        if (this.newPlace.thumbnail) {
-          const thumbnailBlob = this.dataURItoBlob(this.newPlace.thumbnail);
-          formData.append('thumbnail', thumbnailBlob, 'thumbnail.jpg');
-        }
+onMounted( () => {
 
-        // 여러 이미지가 있는 경우 추가
-        if (this.src.length > 0) {
-          this.src.forEach((image, index) => {
-            const imageBlob = this.dataURItoBlob(image);
-            formData.append('multipartFiles', imageBlob, `image${index}.jpg`);
-          });
-        }
+  console.log("Pinia Store values:");
+  console.log("Latitude from Pinia:", piniaStore.latitude);
+  console.log("Longitude from Pinia:", piniaStore.longitude);
+  console.log("CategoryId from Pinia:", piniaStore.categoryId);
 
-        // 서버에 FormData 전송
-        const response = await apiClient.post('/place', formData, {
-          headers: {
-            'Content-Type': 'multipart/form-data'
-          }
-        });
+  newPlace.categoryId = piniaStore.categoryId;
+  newPlace.latitude = piniaStore.latitude;
+  newPlace.longitude = piniaStore.longitude;
 
-        // 업로드 성공
-        console.log("Upload successful", response.data);
-      } catch (error) {
-         // 에러 발생 시 alert로 에러 메시지 띄우기
-         if (error.response && error.response.data) {
-          alert('생성 에러');  // 서버에서 전달된 에러 메시지
-        } else {
-          alert("생성성공");
-        }
-        console.error("Upload failed", error);
-      }
-    },
+  console.log(newPlace);
+  
+})
 
-    addImage(e) {
-      const [file] = e.target.files;
-      if (file) {
-        this.resizeImage(file, 200, 200, (resizedImageUrl) => {
-          this.newPlace.thumbnail = resizedImageUrl;  // 대표 사진으로 설정
-        });
-      }
-    },
+const isOpen = ref(false); // 드롭다운 열림 여부
+const selectedClass = ref('ellipse-2'); // 기본 선택된 색상
+const colors = ref([
+  { className: "ellipse-2" },
+  { className: "ellipse-3" },
+  { className: "ellipse-4" },
+  { className: "ellipse-5" },
+  { className: "ellipse-6" }
+]);
 
-    addImages(e) {
-      const files = e.target.files;
-      let newList = [];
-      for (let i = 0; i < files.length; i++) {
-        this.resizeImage(files[i], 200, 200, (resizedImageUrl) => {
-          newList.push(resizedImageUrl);
-        });
-      }
-      this.src = newList;
-    },
+const src = ref([]);
 
-    resizeImage(file, width, height, callback) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement("canvas");
-          const ctx = canvas.getContext("2d");
+const submit = async () => {
+  try {
+    const formData = new FormData();
 
-          // 리사이즈된 크기로 캔버스 설정
-          canvas.width = width;
-          canvas.height = height;
+    // 일반 텍스트 필드 추가
+    formData.append('name', newPlace.name);
+    formData.append('content', newPlace.content);
+    formData.append('color', newPlace.color);
+    formData.append('latitude', newPlace.latitude);
+    formData.append('longitude', newPlace.longitude);
+    formData.append('categoryId', newPlace.categoryId);
 
-          // 이미지 그리기
-          ctx.drawImage(img, 0, 0, width, height);
-
-          // 리사이즈된 이미지 URL 얻기
-          const resizedImageUrl = canvas.toDataURL("image/jpeg");
-
-          // 콜백을 통해 리사이즈된 이미지 URL 전달
-          callback(resizedImageUrl);
-        };
-        img.src = event.target.result;
-      };
-      reader.readAsDataURL(file);
-    },
-
-    toggleDropdown() {
-      this.isOpen = !this.isOpen;
-    },
-
-    selectColor(colorClass) {
-      this.selectedClass = colorClass;
-      this.newPlace.color = colorClass;  // 선택된 색상을 newPlace에 넣기
-      this.isOpen = false; // 선택 후 드롭다운 닫기
-    },
-
-    // Base64를 Blob으로 변환하는 메소드
-    dataURItoBlob(dataURI) {
-      const byteString = atob(dataURI.split(',')[1]);
-      const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
-      const arrayBuffer = new ArrayBuffer(byteString.length);
-      const uintArray = new Uint8Array(arrayBuffer);
-      for (let i = 0; i < byteString.length; i++) {
-        uintArray[i] = byteString.charCodeAt(i);
-      }
-      return new Blob([uintArray], { type: mimeString });
+    // 썸네일 이미지가 있는 경우 추가
+    if (newPlace.thumbnail) {
+      const thumbnailBlob = dataURItoBlob(newPlace.thumbnail);
+      formData.append('thumbnail', thumbnailBlob, 'thumbnail.jpg');
     }
+
+    // 여러 이미지가 있는 경우 추가
+    if (src.value.length > 0) {
+      src.value.forEach((image, index) => {
+        const imageBlob = dataURItoBlob(image);
+        formData.append('multipartFiles', imageBlob, `image${index}.jpg`);
+      });
+    }
+
+    // 서버에 FormData 전송
+    const response = await apiClient.post('/place', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
+    });
+
+    // 업로드 성공
+    console.log("Upload successful", response.data);
+  } catch (error) {
+    // 에러 발생 시 alert로 에러 메시지 띄우기
+    if (error.response && error.response.data) {
+      alert('생성 에러');  // 서버에서 전달된 에러 메시지
+    } else {
+      alert("생성 성공");
+    }
+    console.error("Upload failed", error);
   }
 };
+
+const addImage = (e) => {
+  const [file] = e.target.files;
+  if (file) {
+    resizeImage(file, 200, 200, (resizedImageUrl) => {
+      newPlace.thumbnail = resizedImageUrl;  // 대표 사진으로 설정
+    });
+  }
+};
+
+const addImages = (e) => {
+  const files = e.target.files;
+  let newList = [];
+  for (let i = 0; i < files.length; i++) {
+    resizeImage(files[i], 200, 200, (resizedImageUrl) => {
+      newList.push(resizedImageUrl);
+    });
+  }
+  src.value = newList;
+};
+
+const resizeImage = (file, width, height, callback) => {
+  const reader = new FileReader();
+  reader.onload = (event) => {
+    const img = new Image();
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
+
+      // 리사이즈된 크기로 캔버스 설정
+      canvas.width = width;
+      canvas.height = height;
+
+      // 이미지 그리기
+      ctx.drawImage(img, 0, 0, width, height);
+
+      // 리사이즈된 이미지 URL 얻기
+      const resizedImageUrl = canvas.toDataURL("image/jpeg");
+
+      // 콜백을 통해 리사이즈된 이미지 URL 전달
+      callback(resizedImageUrl);
+    };
+    img.src = event.target.result;
+  };
+  reader.readAsDataURL(file);
+};
+
+const toggleDropdown = () => {
+  isOpen.value = !isOpen.value;
+};
+
+const selectColor = (colorClass) => {
+  selectedClass.value = colorClass;
+  newPlace.color = colorClass;  // 선택된 색상을 newPlace에 넣기
+  isOpen.value = false; // 선택 후 드롭다운 닫기
+};
+
+// Base64를 Blob으로 변환하는 메소드
+const dataURItoBlob = (dataURI) => {
+  const byteString = atob(dataURI.split(',')[1]);
+  const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0];
+  const arrayBuffer = new ArrayBuffer(byteString.length);
+  const uintArray = new Uint8Array(arrayBuffer);
+  for (let i = 0; i < byteString.length; i++) {
+    uintArray[i] = byteString.charCodeAt(i);
+  }
+  return new Blob([uintArray], { type: mimeString });
+};
 </script>
+
 <style scoped>
 .full * {
   box-sizing: border-box;
