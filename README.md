@@ -183,12 +183,8 @@
 ![Image](https://github.com/user-attachments/assets/4ca5ccfc-b85a-4cd2-ba91-ab764cb18d40)
 ![Image](https://github.com/user-attachments/assets/10d59789-7d3e-4fb3-bb93-693fae454f58)
 
-
-
 ## 나만의 장소 생성
-
 ![Image](https://github.com/user-attachments/assets/11ac027e-0b8c-4899-970e-b21d4de9e62f)
-
 ![Image](https://github.com/user-attachments/assets/b8a6a56e-5b32-44a1-a1ad-33282d1c2267)
 
 
