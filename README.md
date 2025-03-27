@@ -165,13 +165,18 @@
 
 # 테스트 계획 및 결과 보고서(시연결과 캡쳐등)
 
-![myplace](https://github.com/user-attachments/assets/8624fb76-1700-4e95-8c49-c9e313d4e84a)
-
-
-![mycategory](https://github.com/user-attachments/assets/a54766eb-b0ad-4476-9b8f-43f3eab1d5cd)
-
-
-![mypage](https://github.com/user-attachments/assets/dffb9979-687b-4500-8e7f-4f1d36070ce7)
+![Image](https://github.com/user-attachments/assets/b22d739e-2b5b-4eb5-8588-ee818eaa9e6b)
+![Image](https://github.com/user-attachments/assets/3ea9e977-fb08-4b9b-b766-8b93536dc4b3)
+![Image](https://github.com/user-attachments/assets/4ca5ccfc-b85a-4cd2-ba91-ab764cb18d40)
+![Image](https://github.com/user-attachments/assets/10d59789-7d3e-4fb3-bb93-693fae454f58)
+![Image](https://github.com/user-attachments/assets/55346de1-63be-4017-9e1a-a503cd02702a)
+![Image](https://github.com/user-attachments/assets/6cad3bea-603a-4130-a1fa-3a9568bc220e)
+![Image](https://github.com/user-attachments/assets/8dd03504-df50-42f5-811f-44bc42487ed3)
+![Image](https://github.com/user-attachments/assets/3501c5e3-3223-497b-b385-a3310e049539)
+![Image](https://github.com/user-attachments/assets/56c015f5-7622-416e-bd74-ad4ede0d359e)
+![Image](https://github.com/user-attachments/assets/9092d154-68fa-4d44-a4b5-19391551f404)
+![Image](https://github.com/user-attachments/assets/5c805032-3469-4fc1-958c-b751a744c81c)
+![Image](https://github.com/user-attachments/assets/198a1f2a-212b-4baa-b05d-defdbc91e282)
 
 
 
