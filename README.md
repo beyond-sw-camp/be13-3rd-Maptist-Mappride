@@ -165,13 +165,17 @@
 
 # 테스트 계획 및 결과 보고서(시연결과 캡쳐등)
 
+
+## 소셜로그인
+![Image](https://github.com/user-attachments/assets/55346de1-63be-4017-9e1a-a503cd02702a)
+
 ## 카테고리 생성
 ![Image](https://github.com/user-attachments/assets/b22d739e-2b5b-4eb5-8588-ee818eaa9e6b)
 ## 댓글 기능
 ![Image](https://github.com/user-attachments/assets/3ea9e977-fb08-4b9b-b766-8b93536dc4b3)
 ![Image](https://github.com/user-attachments/assets/4ca5ccfc-b85a-4cd2-ba91-ab764cb18d40)
 ![Image](https://github.com/user-attachments/assets/10d59789-7d3e-4fb3-bb93-693fae454f58)
-![Image](https://github.com/user-attachments/assets/55346de1-63be-4017-9e1a-a503cd02702a)
+
 ![Image](https://github.com/user-attachments/assets/6cad3bea-603a-4130-a1fa-3a9568bc220e)
 ![Image](https://github.com/user-attachments/assets/8dd03504-df50-42f5-811f-44bc42487ed3)
 ![Image](https://github.com/user-attachments/assets/3501c5e3-3223-497b-b385-a3310e049539)
