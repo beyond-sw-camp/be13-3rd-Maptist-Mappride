@@ -41,20 +41,20 @@ export const usePiniaStore = defineStore('auth', () => {
     }
 
     // newPlaceComponent.vue 에서 사용
-    let latitude = '';
-    let longitude = '';
-    let categoryId = '';
+    const latitude = ref('');
+    const longitude = ref('');
+    const categoryId = ref('');
 
     const getLatitude = (latitudeData) => {
-        latitude = latitudeData;
+        latitude.value = latitudeData;
     };
 
     const getLongitude = (longitudeData) => {
-        longitude = longitudeData;
+        longitude.value = longitudeData;
     };
 
     const getCategoryId = (categoryIdData) => {
-        categoryId = categoryIdData;
+        categoryId.value = categoryIdData;
     };
 
     return { categories, getCategory, latitude, getLatitude, longitude, getLongitude, categoryId, getCategoryId, getMyCategories};

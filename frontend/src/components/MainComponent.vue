@@ -16,7 +16,10 @@
 import { defineProps, onMounted, watch, ref, computed } from 'vue';
 import { usePiniaStore } from '@/stores/pinia.js';
 import apiClient from '@/api/axios.js';
+import { useRoute,useRouter  } from 'vue-router';
 
+const router = useRouter();
+const route = useRoute();
 // Pinia store에서 category 값을 가져옵니다
 const piniaStore = usePiniaStore();
 
@@ -67,17 +70,17 @@ onMounted(() => {
             }
           });
 
-          // 정보 창 내용 구성
-          const contentString = [
-            '<div class="iw_inner" style="width: 360px; height: 120px; padding: 5px; font-size: 20px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">',
-              `   <h3>신규 장소를 생성하시겠습니까?</h3>`,
-              `   <a href="/api/v1/new-place">새로운 장소 만들기</a>`,
-            '</div>'
-          ].join('');
+          // // 정보 창 내용 구성
+          // const contentString = [
+          //   '<div class="iw_inner" style="width: 360px; height: 120px; padding: 5px; font-size: 20px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;">',
+          //     `   <h3>신규 장소를 생성하시겠습니까?</h3>`,
+          //     `   <a href="/api/v1/new-place">새로운 장소 만들기</a>`,
+          //   '</div>'
+          // ].join('');
 
-          const infowindow = new naver.maps.InfoWindow({
-            content: contentString,
-          });
+          // const infowindow = new naver.maps.InfoWindow({
+          //   content: contentString,
+          // });
 
           // 마커 클릭 시 정보 창을 띄우도록 이벤트 추가
           naver.maps.Event.addListener(marker, 'click', () => {
@@ -91,25 +94,33 @@ onMounted(() => {
             });
             markerMap = [];  // 배열 초기화
 
-            // 이미 정보 창이 열려있으면 닫고, 그렇지 않으면 열도록 처리
-            if (infowindow.getMap()) {
-              infowindow.close();
-            } else {
-              infowindow.open(map.value, marker);
-            }
+            // // 이미 정보 창이 열려있으면 닫고, 그렇지 않으면 열도록 처리
+            // if (infowindow.getMap()) {
+            //   infowindow.close();
+            // } else {
+            //   infowindow.open(map.value, marker);
+            // }
 
             const point = new naver.maps.LatLng(e.coord.lat(), e.coord.lng());
               map.value.setCenter(point);  // 해당 위치로 지도 중심 이동
               map.value.setZoom(16);
 
-            piniaStore.getLatitude(e.coord.lat());
-            piniaStore.getLongitude(e.coord.lng());
-            piniaStore.getCategoryId(categoriesId);
+            
+            if(confirm('새로운 장소를 생성하시겠습니까?')){
+              piniaStore.getLatitude(e.coord.lat());
+              piniaStore.getLongitude(e.coord.lng());
+              piniaStore.getCategoryId(categoriesId);
+
+              router.push({ name: 'NewPlace' });
+
+              
+            }
+
+            
 
             // 생성한 마커와 정보창을 markers 배열에 저장
             markerMap.push({
               marker: marker,
-              infowindow: infowindow
             });
           });
         }
