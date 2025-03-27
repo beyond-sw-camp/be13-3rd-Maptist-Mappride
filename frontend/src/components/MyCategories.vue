@@ -120,7 +120,8 @@ export default {
       categories.value = [];
       categories.value = newCategories;
       initializeCategoryOptions(); // 데이터 로딩 후 초기화
-    
+      
+
 
     });
 
@@ -337,10 +338,10 @@ const deleteCategory = async (index) => {
       updateName,
       resetCategory,
       // paginatedCategories,
-      currentPage,
-      totalPages,
-      nextPage,
-      prevPage,
+      // currentPage,
+      // totalPages,
+      // nextPage,
+      // prevPage,
       // filteredCategories,
       btnSearchClick
     };
