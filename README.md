@@ -66,7 +66,6 @@
 <br>
 
 ![javascript](https://github.com/user-attachments/assets/8f53173c-875e-4499-a047-0179e78bb4c9)
-![html](https://github.com/user-attachments/assets/9b137699-cac1-4ae0-a9de-3a96df93a570)
 ![css](https://github.com/user-attachments/assets/a69cd151-57a2-49e1-adf8-fb3e0b219539)
 ![vue](https://github.com/user-attachments/assets/89ddc02d-b904-4ab8-a51e-dbcb3511274f)
 ![axios](https://github.com/user-attachments/assets/e83b6c8a-b20f-4582-8526-51feb9899f46)
