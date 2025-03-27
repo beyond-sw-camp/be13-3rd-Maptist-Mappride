@@ -57,15 +57,6 @@ onMounted(() => {
 
         if (categoriesId)
         {
-            // 기존 마커들과 정보창 삭제
-            markerMap.forEach(markerData => {
-              markerData.marker.setMap(null);  // 마커 삭제
-              if (markerData.infowindow.getMap()) {
-                markerData.infowindow.close();  // 열린 정보창 닫기
-              }
-            });
-            markerMap = [];  // 배열 초기화
-
             const marker = new naver.maps.Marker({
             position: e.coord,
             map: map.value,
@@ -90,6 +81,16 @@ onMounted(() => {
 
           // 마커 클릭 시 정보 창을 띄우도록 이벤트 추가
           naver.maps.Event.addListener(marker, 'click', () => {
+
+            // 기존 마커들과 정보창 삭제
+            markerMap.forEach(markerData => {
+              markerData.marker.setMap(null);  // 마커 삭제
+              if (markerData.infowindow.getMap()) {
+                markerData.infowindow.close();  // 열린 정보창 닫기
+              }
+            });
+            markerMap = [];  // 배열 초기화
+
             // 이미 정보 창이 열려있으면 닫고, 그렇지 않으면 열도록 처리
             if (infowindow.getMap()) {
               infowindow.close();
@@ -97,21 +98,21 @@ onMounted(() => {
               infowindow.open(map.value, marker);
             }
 
-          const point = new naver.maps.LatLng(place.latitude, place.longitude);
-            map.value.setCenter(point);  // 해당 위치로 지도 중심 이동
-            map.value.setZoom(16);
+            const point = new naver.maps.LatLng(e.coord.lat(), e.coord.lng());
+              map.value.setCenter(point);  // 해당 위치로 지도 중심 이동
+              map.value.setZoom(16);
 
-          piniaStore.getLatitude(e.coord.lat());
-          piniaStore.getLongitude(e.coord.lng());
-          piniaStore.getCategoryId(categoriesId);
-        });
+            piniaStore.getLatitude(e.coord.lat());
+            piniaStore.getLongitude(e.coord.lng());
+            piniaStore.getCategoryId(categoriesId);
+
+            // 생성한 마커와 정보창을 markers 배열에 저장
+            markerMap.push({
+              marker: marker,
+              infowindow: infowindow
+            });
+          });
         }
-
-        // 생성한 마커와 정보창을 markers 배열에 저장
-        markerMap.push({
-          marker: marker,
-          infowindow: infowindow
-        });
     });
   }
 });
