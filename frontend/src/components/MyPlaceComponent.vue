@@ -945,11 +945,11 @@ button:hover {
   border-style: solid;
   border-color: #d2d2d2;
   border-width: 1px;
-  width: 1552px;
-  height: 65px;
+  width: 1542px;
+  height: 79px;
   position: absolute;
   left: 346px;
-  top: 155px;
+  top: 156px;
   align-content: center;
   padding-left: 10px;
 }

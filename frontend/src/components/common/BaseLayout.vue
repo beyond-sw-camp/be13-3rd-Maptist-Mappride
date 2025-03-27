@@ -44,7 +44,7 @@
 
     <div v-if="route.name === 'Categories' || route.name === 'Place'">
       <div class="lblName">name</div>
-      <input v-model="searchQuery" class="txtSearch" type="text" placeholder="Search..." />
+      <input :value="txtSearchModel" class="txtSearch" type="text" placeholder="Search..." @input="txtChanging"/>
       <button class="btnSearch" @click="btnSearchClick">search</button>
     </div>
 
@@ -53,7 +53,7 @@
     <div v-if="route.name === 'Login'">
       <input class="txtSearch" type="text" placeholder="Search..." />
       <button class="btnSearch"@click="onsearch">search</button>
-      <button class="btnLogin">login</button>
+      <button class="btnLogin">login</button>``
     </div>
   </div>
 
@@ -140,13 +140,20 @@
 
   const btnSearchClick = async () => {
     try {
-      if (selectedOption.value === 'address') {
-        address.addressValue = txtSearchModel.value;
-      } else if (route.name === 'Main') {
+      if(route.name === 'Categories'){
+
+        if (!txtSearchModel.value) return;
+
+        piniaStore.getMyCategoryName(txtSearchModel.value);
+      }
+      else if (route.name === 'Main') {
+
         if (!txtMemberId.value) return;
 
         piniaStore.getCategory(txtMemberId.value);
-      }
+
+      } 
+
       // 카테고리 검색 추가
       // else if (selectedOption.value === 'category') {  
       //   if (!txtSearchModel.value) return;
@@ -162,11 +169,8 @@
     } catch (error) {
       console.error('API 요청 실패:', error);
       alert('검색 실패. 다시 시도해주세요.');
-    }
-  };
-
-
-
+    };
+  }
 </script>
     
 <style scoped>
