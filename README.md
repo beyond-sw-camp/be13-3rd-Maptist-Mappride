@@ -165,7 +165,9 @@
 
 # 테스트 계획 및 결과 보고서(시연결과 캡쳐등)
 
+## 카테고리 생성
 ![Image](https://github.com/user-attachments/assets/b22d739e-2b5b-4eb5-8588-ee818eaa9e6b)
+## 댓글 기능
 ![Image](https://github.com/user-attachments/assets/3ea9e977-fb08-4b9b-b766-8b93536dc4b3)
 ![Image](https://github.com/user-attachments/assets/4ca5ccfc-b85a-4cd2-ba91-ab764cb18d40)
 ![Image](https://github.com/user-attachments/assets/10d59789-7d3e-4fb3-bb93-693fae454f58)
