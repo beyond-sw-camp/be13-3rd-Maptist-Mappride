@@ -27,16 +27,16 @@
     <button v-if="route.name == 'Main'" class="myCategories" @click="showMyCategories()">My Categories</button>
 
     <div v-if="route.name === 'Main'">
-      <select v-model="selectedOption" class="btnDD">
+      <!-- <select v-model="selectedOption" class="btnDD">
           <option value="address">Address</option>
           <option value="user">User</option>
-      </select>
-
+      </select> -->
+      <div class="lblName">user</div>
       <input :value="txtSearchModel" class="txtSearch" type="text" placeholder="Search..." @input="txtChanging">
       <ul v-if="filteredData.length > 0" class="lookupResults">
         <li
           v-for="(item, index) in filteredData" :key="index" @click="onItemSelect(item)" class="lookupItem">
-          {{ item.id + ' ' + item.name + ' ' + item.nickname }}
+          {{ "이름: " + item.name + ' / ' + "닉네임: " + item.nickname }}
         </li>
       </ul>
       <button class="btnSearch" >search</button>
@@ -100,7 +100,7 @@
     try {
       txtSearchModel.value = event.target.value;
 
-      if (selectedOption.value === 'user') {
+      if (route.name === 'Main') {
         const response = await apiClient.get(`/members/name?name=${txtSearchModel.value}`);
 
         if (response.status === 200) {
@@ -125,7 +125,7 @@
     filteredData.value = [];
 
     try {
-      if (selectedOption.value === 'user') {
+      if (route.name === 'Main') {
         if (!txtMemberId.value) return;
         
         piniaStore.getCategory(txtMemberId.value);
@@ -140,7 +140,7 @@
     try {
       if (selectedOption.value === 'address') {
         address.addressValue = txtSearchModel.value;
-      } else if (selectedOption.value === 'user') {
+      } else if (route.name === 'Main') {
         if (!txtMemberId.value) return;
 
         piniaStore.getCategory(txtMemberId.value);
@@ -330,7 +330,7 @@
     border-color: #d2d2d2;
     border-width: 1px;
     width: 165px;
-    height: 45px;
+    height: 42px;
     display: flex;
     justify-content: center; /* 텍스트 수평 중앙 정렬 */
     align-items: center; /* 텍스트 수직 중앙 정렬 */
