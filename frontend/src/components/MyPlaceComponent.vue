@@ -10,11 +10,11 @@
     <div class="color-dividing-line"></div>
 
     <ul class="place-list">
-      <li v-for="(place, index) in paginatedPlaces" :key="index" class="place-item">
+      <li v-for="(place, index) in places" :key="index" class="place-item">
         <router-link :to="`/api/v1/place/${place.placeId}`" class="place-link">
-            {{ place.name }} 
-          </router-link>
-        <div :class="place.address" class="place-address">{{ place.address }}</div>
+          {{ place.name }} 
+        </router-link>
+        <div class="place-address">{{ place.address }}</div>
         <div :class="place.color" class="place-color"></div>
       </li>
     </ul>
@@ -23,14 +23,6 @@
     <div class="backitem" @click="goback">
       <a class="backlink">. . . /</a>
     </div>
-
-    <!-- 페이지네이션 버튼 -->
-    <div class="pagination">
-      <button @click="prevPage" :disabled="currentPage === 1">Previous</button>
-      <span>Page {{ currentPage }} of {{ totalPages }}</span>
-      <button @click="nextPage" :disabled="currentPage === totalPages">Next</button>
-    </div>
-
 
     <!-- 정렬 드롭다운 -->
     <div class="sortDropdown" @click="toggleSortDropdown">
@@ -49,188 +41,93 @@
     </div>
   </div>
 </template>
-  <script>
-  import { ref, onMounted,computed } from "vue";
-  import apiClient from "@/api/axios.js";
-  import { useRoute, useRouter } from "vue-router";
-  
-  export default {
-    name: "Two",
-    setup() {
-      const route = useRoute();
-      const router = useRouter();
-      const places = ref([]);
-      // const colorDropdownVisible = ref([]);
-      // const selectedClass = ref([]);
-      const categoryId = ref(route.params.categoryId);
 
-      // 페이지네이션 관련 변수
-      const currentPage = ref(1);  // 현재 페이지
-      const itemsPerPage = 10;      // 한 페이지당 항목 수
-      const totalPages = ref(1);   // 총 페이지 수
+<script>
+import { ref, onMounted } from "vue";
+import apiClient from "@/api/axios.js";
+import { useRoute, useRouter } from "vue-router";
 
-      // 페이지네이션에 맞는 데이터만 표시하도록 처리
-      const paginatedPlaces = computed(() => {
-        const startIndex = (currentPage.value - 1) * itemsPerPage;
-        const endIndex = startIndex + itemsPerPage;
-        return places.value.slice(startIndex, endIndex);
-      });
+export default {
+  name: "Two",
+  setup() {
+    const route = useRoute();
+    const router = useRouter();
+    const places = ref([]);
+    const categoryId = ref(route.params.categoryId);
 
-      // 현재 URL에서 categoryName을 가져옴
-      const categoryName = computed(() => route.params.categoryName || ". . . /");
-
-      
-      const goback = () => {
-        router.go(-1); // 이전 페이지로 이동
-      };
-
-      // 페이지가 마운트되면 장소 데이터를 받아옴
-      onMounted(async () => {
-        try {
-          const categoryId = String(route.params.categoryId); // 문자열 변환
-          console.log("📌 변환된 categoryId:", categoryId, typeof categoryId);
-
-          const url = `/categories/${categoryId}/places`; // baseURL 적용됨
-          console.log("🚀 요청 URL:", url);
-
-          const response = await apiClient.get(url); // 비동기 요청
-          console.log("✅ 서버 응답 데이터:", response.data);
-
-
-          // 데이터가 배열인지 확인 후 할당
-          if (Array.isArray(response.data)) {
-            places.value = response.data.map((place, index) => {
-              const createdAtDate = place.reg_date ? new Date(place.reg_date) : new Date();
-              console.log(`🕒 장소 ${index} - reg_date:`, place.reg_date, "➡️ 변환된 createdAt:", createdAtDate);
-              return { ...place, createdAt: createdAtDate }; // reg_date를 기반으로 createdAt 설정
-            });
-
-            // 총 페이지 수 계산
-            totalPages.value = Math.ceil(places.value.length / itemsPerPage);
-          } else {
-            console.error("❌ 응답 데이터가 배열이 아닙니다:", response.data);
-          }
-
-          initializeCategoryOptions(); // 데이터 로딩 후 초기화
-
-        } catch (error) {
-          console.error("❌ 에러 발생:", error);
-        }
-      });
-
-      // 페이지 이동 함수
-      const nextPage = () => {
-        if (currentPage.value < totalPages.value) {
-          currentPage.value++;
-        }
-      };
-
-      const prevPage = () => {
-        if (currentPage.value > 1) {
-          currentPage.value--;
-        }
-      };
-
-      const initializeCategoryOptions = () => {
-        // places.value가 배열인지 확인 후에만 forEach 실행
-        if (Array.isArray(places.value)) {
-          places.value.forEach((place) => {
-            console.log("🎯 각 place 객체:", place);
-            place.isModify = false;
-             // 색상 값 추가 예시 (API에서 받아오는 색상값을 해당 필드에 저장)
-             console.log("🎨 색상 값:", place.color);
-             console.log("🏠 주소 값:", place.address);  // 주소 출력
-            //  place.colorClass = getColorClassForPlace(place); // 색상 클래스 설정
-          });
-        }
-      };
-
-
-      const getColorClassForPlace = (place) => {
-        console.log("🔍 색상 클래스 결정:", place.color);
-      // 예시: place.color 값에 따라 적절한 색상 클래스를 반환하는 함수
-      switch (place.color) {
-        case "pink":
-          return "ellipse-2";
-        case "mint":
-          return "ellipse-3";
-        case "blue":
-          return "ellipse-4";
-        case "orange":
-          return "ellipse-5";
-        default:
-          return "ellipse-6";
-      }
+    const goback = () => {
+      router.go(-1);
     };
-  
-      const sortDropdownVisible = ref(false);
-      const selectedSortImage = ref("/src/assets/images/MyPlaceComponent/filter.png");
-      const selectedSort = ref("Filter");
-      const sortOptions = ref([
-        { value: "date-asc", label: "최신순", image: "/src/assets/images/MyPlaceComponent/image-430.png" },
-        { value: "date-desc", label: "최신순", image: "/src/assets/images/MyPlaceComponent/image-400.png" },
-        { value: "name-asc", label: "이름순", image: "/src/assets/images/MyPlaceComponent/image-430.png" },
-        { value: "name-desc", label: "이름순", image: "/src/assets/images/MyPlaceComponent/image-400.png" }
-      ]);
-  
-      // Axios로 데이터 받아오기
-      const fetchPlaces = async () => {
-        try {
-          const response = await axios.get("API_URL"); // 여기에 실제 API URL을 넣어주세요
-          console.log("받은 데이터:", response.data);
-          places.value = response.data; // API에서 반환된 데이터로 places 값을 업데이트
-        } catch (error) {
-          console.error("데이터를 가져오는 데 실패했습니다:", error);
+
+    onMounted(async () => {
+      try {
+        const categoryId = String(route.params.categoryId);
+        console.log("📌 변환된 categoryId:", categoryId);
+
+        const url = `/categories/${categoryId}/places`;
+        console.log("🚀 요청 URL:", url);
+
+        const response = await apiClient.get(url);
+        console.log("✅ 서버 응답 데이터:", response.data);
+
+        if (Array.isArray(response.data)) {
+          places.value = response.data.map((place) => {
+            return { ...place, createdAt: new Date(place.reg_date || Date.now()) };
+          });
+        } else {
+          console.error("❌ 응답 데이터가 배열이 아닙니다:", response.data);
         }
-      };
+      } catch (error) {
+        console.error("❌ 에러 발생:", error);
+      }
+    });
 
-  
-      // 정렬 드롭다운 관련 함수
-      const toggleSortDropdown = () => {
-        sortDropdownVisible.value = !sortDropdownVisible.value;
-      };
-  
+    const sortDropdownVisible = ref(false);
+    const selectedSortImage = ref("/src/assets/images/MyPlaceComponent/filter.png");
+    const selectedSort = ref("Filter");
+    const sortOptions = ref([
+      { value: "date-asc", label: "최신순", image: "/src/assets/images/MyPlaceComponent/image-430.png" },
+      { value: "date-desc", label: "최신순", image: "/src/assets/images/MyPlaceComponent/image-400.png" },
+      { value: "name-asc", label: "이름순", image: "/src/assets/images/MyPlaceComponent/image-430.png" },
+      { value: "name-desc", label: "이름순", image: "/src/assets/images/MyPlaceComponent/image-400.png" }
+    ]);
 
-      const sortBy = (criteria) => {
-        if (criteria === "date-asc") {
-          places.value.sort((a, b) => new Date(a.reg_date) - new Date(b.reg_date));
-        } else if (criteria === "date-desc") {
-          places.value.sort((a, b) => new Date(b.reg_date) - new Date(a.reg_date));
-        } else if (criteria === "name-asc") {
-          places.value.sort((a, b) => a.name.localeCompare(b.name));
-        } else if (criteria === "name-desc") {
-          places.value.sort((a, b) => b.name.localeCompare(a.name));
-        }
-        console.log("✅ 정렬 완료:", places.value);
-      };
+    const toggleSortDropdown = () => {
+      sortDropdownVisible.value = !sortDropdownVisible.value;
+    };
 
+    const sortBy = (criteria) => {
+      if (criteria === "date-asc") {
+        places.value.sort((a, b) => new Date(a.reg_date) - new Date(b.reg_date));
+      } else if (criteria === "date-desc") {
+        places.value.sort((a, b) => new Date(b.reg_date) - new Date(a.reg_date));
+      } else if (criteria === "name-asc") {
+        places.value.sort((a, b) => a.name.localeCompare(b.name));
+      } else if (criteria === "name-desc") {
+        places.value.sort((a, b) => b.name.localeCompare(a.name));
+      }
+      console.log("✅ 정렬 완료:", places.value);
+    };
 
-      const setSortOrder = (option) => {
-        selectedSort.value = option.label;
-        selectedSortImage.value = option.image;
-        
-        sortBy(option.value);  // 정렬 함수 실행
-      };
+    const setSortOrder = (option) => {
+      selectedSort.value = option.label;
+      selectedSortImage.value = option.image;
+      sortBy(option.value);
+    };
 
-      return {
-        places,
-        paginatedPlaces,
-        currentPage,
-        totalPages,
-        nextPage,
-        prevPage,
-        sortDropdownVisible,
-        selectedSort,
-        sortOptions,
-        selectedSortImage,
-        toggleSortDropdown,
-        setSortOrder,
-        goback,
-        categoryName,
-      };
-    }
-  };
-  </script>
+    return {
+      places,
+      sortDropdownVisible,
+      selectedSort,
+      sortOptions,
+      selectedSortImage,
+      toggleSortDropdown,
+      setSortOrder,
+      goback
+    };
+  }
+};
+</script>
 <style scoped>
 /* .full * {
   box-sizing: border-box;
