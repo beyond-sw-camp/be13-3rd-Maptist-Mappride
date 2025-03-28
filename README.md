@@ -100,8 +100,24 @@
 <br><br>
 
 
+
 # 📌 기획 
 
+<br>
+
+## 요구사항 명세서
+
+<details>
+<div markdown="1">
+
+![Image](https://github.com/user-attachments/assets/48a98e02-cfa8-4c94-a3b3-be0072374b50)
+![Image](https://github.com/user-attachments/assets/7a3c6ed3-ef2b-446a-96ab-26939c814fd5)
+![Image](https://github.com/user-attachments/assets/75cbb69c-4dd3-4e29-94a6-6e153fa3771e)
+
+</div>
+</details>
+
+    
 <br>
 
 ## 화면설계서 with.피그마
@@ -171,7 +187,9 @@
 </div>
 </details>
 
+
 <br><br>
+
 
 # 📌 테스트 계획 및 결과 보고서
 
@@ -276,7 +294,7 @@
 </details>
 
 
-
+<br><br>
 
 # 📌 회고
 
