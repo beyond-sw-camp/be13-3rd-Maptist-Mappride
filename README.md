@@ -19,20 +19,20 @@
 
 <br>
 
-**내 지도 카테고리와 카테고리에 포함된 장소들을 지도 상에서 쉽게 관리**
+**1️⃣ 내 지도 카테고리와 카테고리에 포함된 장소들을 지도 상에서 쉽게 관리**
 
 * 나의 취향이 담긴 지도를 제작
 * 지도 화면에 마커를 통해 나만의 지도를 시각적으로 표현
 
 <br>
 
-**위치 정보와 카테고리를 기반으로 장소를 추가, 수정, 삭제와 공간에 대한 나의 리뷰**
+**2️⃣ 위치 정보와 카테고리를 기반으로 장소를 추가, 수정, 삭제와 공간에 대한 나의 리뷰**
 
 * 카테고리별로 모아놓은 일정한 장소들의 관리 기능 제공
 
 <br>
 
-**내 지도를 사용자들과 공유**
+**3️⃣ 내 지도를 사용자들과 공유**
 
 * 내 카테고리를 사용자들과 공유 및 다른 사용자들의 카테고리를 열람 가능
 * 사용자별로 등급을 제공하여 사용자들의 참여를 독려
@@ -105,22 +105,73 @@
 
 <br>
 
-## 요구사항 명세서
+## 1️⃣ 요구사항 명세서
+
+<br>
 
 <details>
+<summary> <b> 메인 페이지(지도) </b> </summary>
 <div markdown="1">
 
-![Image](https://github.com/user-attachments/assets/48a98e02-cfa8-4c94-a3b3-be0072374b50)
-![Image](https://github.com/user-attachments/assets/7a3c6ed3-ef2b-446a-96ab-26939c814fd5)
-![Image](https://github.com/user-attachments/assets/75cbb69c-4dd3-4e29-94a6-6e153fa3771e)
+![Image](https://github.com/user-attachments/assets/5a63c648-82cc-48d1-9f32-8939cff2eb0e)
+
 
 </div>
 </details>
 
+<details>
+<summary> <b> 나만의 장소 생성 페이지 </b> </summary>
+<div markdown="1">
+
+![Image](https://github.com/user-attachments/assets/abe83958-9ce3-480f-8e19-b7f4a2b4ca3c)
+
+
+</div>
+</details>
+
+<details>
+<summary> <b> 나만의 장소 상세보기 페이지 </b> </summary>
+<div markdown="1">
+
+![Image](https://github.com/user-attachments/assets/e2442a2f-8d50-4fbd-b3cf-c74383022211)
+
+
+</div>
+</details>
+
+<details>
+<summary> <b> 마이 페이지 </b> </summary>
+<div markdown="1">
+
+![Image](https://github.com/user-attachments/assets/7f66610f-2d5a-4e59-bb1a-4f7949579d41)
+
+
+</div>
+</details>
+
+<details>
+<summary> <b> 카테고리 관리 페이지 </b> </summary>
+<div markdown="1">
+
+![Image](https://github.com/user-attachments/assets/ed0596a5-06b8-4512-a9ae-edc496d24362)
+
+
+</div>
+</details>
+
+<details>
+<summary> <b> 검색 페이지 </b> </summary>
+<div markdown="1">
+
+![Image](https://github.com/user-attachments/assets/80206087-cb8c-4802-94b6-60e581b19ab7)
+
+
+</div>
+</details>
     
 <br>
 
-## 화면설계서 with.피그마
+## 2️⃣ 화면설계서 with.피그마
 
 <br>
 
@@ -193,16 +244,16 @@
 
 # 📌 테스트 계획 및 결과 보고서
 
-<details>
-<div markdown="1">
+<br>
 
+<details>
 <summary> <b> 소셜로그인 </b> </summary>
+<div markdown="1">
 
 ![Image](https://github.com/user-attachments/assets/55346de1-63be-4017-9e1a-a503cd02702a)
 </div>
 
 </details>
-
 
 <details>
 
